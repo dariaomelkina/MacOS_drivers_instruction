@@ -1,5 +1,5 @@
-# Instruction for creating MacOS Drivers :mage_woman:
-Operational systems course project at UCU. :mage_woman:
+# :mage: Instruction for creating MacOS Drivers 
+Operational systems course project at UCU.
 
 ## Web version
 *coming soon...*
