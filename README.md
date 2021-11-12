@@ -13,7 +13,7 @@ Operational systems course project at UCU.
 
 ---
 # Instruction:
-Let's get started and enter the magical world of the drivers creation.
+Let's get started and enter the magical world of the drivers creation, and May the Force be with You.
 
 ## Annotations:
 
@@ -38,8 +38,13 @@ When writing drivers for MacOS using I/O Kit, the drivers is essentially an I/O 
 piece of hardware [[1](https://www.oreilly.com/library/view/mac-os-x/0321278542/)].
 
 ## More about DriverKit:
-*Information about DriverKit is retrieved from and based on the official presentation of the kit, available by the
-following [link](https://developer.apple.com/videos/play/wwdc2019/702/).* 
+*Information about DriverKit is retrieved from and based on the official presentation of the kit, available by the 
+following [link](https://developer.apple.com/videos/play/wwdc2019/702/) and on the 
+[official documentation](https://developer.apple.com/documentation/driverkit).* 
+
+DriverKit is an SDK, which was introduced during the Worldwide Developers Conference in 2019 along with System 
+Extensions. All DriverKit frameworks are based on the I/O Kit, but they were modernized to be more reliable, 
+secure, and comfortable for development. DriverKit is used to build Driver Extensions (dexts) in the user space. 
 
 Driver extensions are built using DriverKit, they are now a replacement for I/O Kit device drivers.
 
@@ -49,11 +54,25 @@ They are used to control the following devices:
 * NIC (Network Interface Controller)
 * HID (Human Interface Device)
 
-As described in the video by the following [link](https://developer.apple.com/videos/play/wwdc2019/702/)
+As described in the video by the following [link](https://developer.apple.com/videos/play/wwdc2019/702/) 
 there are several advantages to using System Extensions and DriverKit:
+* Unlike kexts, System Extensions run in the user space, bugs in them cannot compromise kernel
+* System Extensions have no restrictions on dynamic memory allocation, synchronization, and latency
+* Building, testing, and debugging can all be performed on one machine
+* Enabled full debugger support
+* There is no need to restart the machine if the extension crushes
+* Kernel and other applications will not stop running if the extension crushes
+* DriverKit provides full modern replacement of the previously discussed I/O kit 
+* DriverKit drivers run in user space, where, just like System Extensions, they cannot compromise kernel and shutter the security 
+* These extensions are available to all the users, even for tasks, previously 
+* Et cetera
 
+Furthermore, starting with new versions of macOS, kexts will be deprecated. 
+It is [officially stated](https://developer.apple.com/documentation/iokit/) by the Apple developer website, 
+that devices supported on macOS 11 and later require DriverKit instead of I/O Kit. 
 
-We will try both approaches, starting with the newer, more secure, and, perhaps, an easier one –– DriverKit.
+We will try both approaches, starting with the newer, more secure, and, perhaps, an easier one –– DriverKit framework.
+
 
 ## Drivers using DriverKit framework:
 *This –– the first version of the instruction –– is based on the official presentation and demonstration of the 
