@@ -1,0 +1,20 @@
+//
+//  ExampleUSBDriver.iig
+//  ExampleUSBDriver
+//
+//
+
+#ifndef ExampleUSBDriver_h
+#define ExampleUSBDriver_h
+
+#include <Availability.h>
+#include <DriverKit/IOService.iig>
+
+class ExampleUSBDriver: public IOService
+{
+public:
+    virtual kern_return_t
+    Start(IOService * provider) override;
+};
+
+#endif /* ExampleUSBDriver_h */

@@ -16,17 +16,21 @@ Operational systems course project at UCU.
 Let's get started and enter the magical world of the drivers creation, and May the Force be with You.
 
 ## Annotations:
+*coming soon...*
 
 ## Notions and acronyms:
 * **Dext** – driver extension.
 * **Kext** – kernel extension.
 * **SDK** – Software Development Kit.
 
-## Introduction to drivers
+## Introduction to drivers:
+*coming soon...*
 
 ## Why we might need to write drivers:
+*coming soon...*
 
 ## Details on the task for MacOS:
+*coming soon...*
 
 ## MacOS tools: 
 In this instruction, we will discuss two possible options, regarding the choice of tools, when writing drivers for 
@@ -56,7 +60,7 @@ They are used to control the following devices:
 
 As described in the video by the following [link](https://developer.apple.com/videos/play/wwdc2019/702/) 
 there are several advantages to using System Extensions and DriverKit:
-* Unlike kexts, System Extensions run in the user space, bugs in them cannot compromise kernel
+* Unlike kexts, System Extensions run in the user space, bugs in them cannot compromise the kernel
 * System Extensions have no restrictions on dynamic memory allocation, synchronization, and latency
 * Building, testing, and debugging can all be performed on one machine
 * Enabled full debugger support
@@ -79,17 +83,20 @@ We will try both approaches, starting with the newer, more secure, and, perhaps,
 usage of the DriverKit, which is available at the following [link](https://developer.apple.com/videos/play/wwdc2019/702/).* 
 
 ## Dext lifecycle:
+*coming soon...*
 
 ## Building:
+*coming soon...*
 
 ## Specific example –– USB driver:
 
 ## Drivers using I/O Kit collection of frameworks:
+*coming soon...*
 
 ## Sources/literature:
 1. "MAC OS X Internals: A Systems Approach" by Amit Singh ([link](https://www.oreilly.com/library/view/mac-os-x/0321278542/))
 2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5)
-3. 
+3. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
 
 
 ## Arranged by:
