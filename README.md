@@ -1,11 +1,17 @@
 # :mage: Instruction for creating MacOS Drivers 
 Operational systems course project at UCU.
 
+### :ukraine: For Ukrainian translation click [here](ukrainian_version.md)
+
+---
+
 ## Web version
 *coming soon...*
 
 ## Table of contents
 *todo*
+
+---
 
 ## Introduction to drivers
 *todo*
