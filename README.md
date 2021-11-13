@@ -122,23 +122,29 @@ for writing drivers with DriverKit SDK and the sample code [5].*
 ## Starting:
 To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
 
-Open Xcode and create a new project (You can also add drivers code to a pre-existing project, Xcode gives an option for this):
+We will add the driver to a pre-existing project, because drivers, created with DriverKit require an app to install and 
+to use them.
 
+Start with creating a new app in the Xcode:
 ![](illustrations/illust1.png)
+![](illustrations/illust2.png)
+
+Now, we will add driver to the project:
+![](illustrations/illust3.png)
 
 Choose a DriverKit driver:
 
-![](illustrations/illust2.png)
+![](illustrations/illust4.png)
 
 Choose options:
 
-![](illustrations/illust3.png)
+![](illustrations/illust5.png)
 
 P.S. You can choose another name, which You would prefer, and specify Your organization identifier.
 
 Now You should be able to see a somewhat similar window:
 
-![](illustrations/illust4.png)
+![](illustrations/illust6.png)
 
 Congratulation! We are *almost* done.
 
@@ -368,6 +374,19 @@ Yet it is not The End –– in order to run that driver You need to perform som
 
 ## Installing Your driver:
 *coming soon...*
+*Based on guidelines and recommendations from [6].*
+
+Now that we have our own little driver we might want to test it and use it. In order to do the we first need to
+install and activate our driver.
+
+The thing is –– all the drivers come with an app, and for DriverKit having an app is a requirement. So we don't just 
+install drivers, we install them from the corresponding app.
+
+In the [Starting](#starting) section before creating a driver we first create an app project, and now we 
+will focus on it.
+
+
+
 
 ---
 
@@ -382,7 +401,7 @@ Yet it is not The End –– in order to run that driver You need to perform som
 3. [Creating a Driver Using the DriverKit SDK](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
 4. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
 5. [Handling Keyboard Events from a Human Interface Device](https://developer.apple.com/documentation/hiddriverkit/handling_keyboard_events_from_a_human_interface_device)
-
+6. [Installing System Extensions and Drivers](https://developer.apple.com/documentation/systemextensions/installing_system_extensions_and_drivers)
 
 ## Arranged by:
 * [Daria Omelkina](https://github.com/dariaomelkina)
