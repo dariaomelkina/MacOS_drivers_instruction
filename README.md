@@ -126,25 +126,31 @@ We will add the driver to a pre-existing project, because drivers, created with 
 to use them.
 
 Start with creating a new app in the Xcode:
+
 ![](illustrations/illust1.png)
 ![](illustrations/illust2.png)
 
-Now, we will add driver to the project:
+P.S. You can choose another name, which You would prefer, and specify Your organization identifier.
+
+Using Swift for the app (driver itself will be written using C++) like in the official documentation:
+
 ![](illustrations/illust3.png)
 
-Choose a DriverKit driver:
+Now, we will add driver to the project:
 
 ![](illustrations/illust4.png)
 
-Choose options:
+Choose a DriverKit driver:
 
 ![](illustrations/illust5.png)
 
-P.S. You can choose another name, which You would prefer, and specify Your organization identifier.
+Choose options:
+
+![](illustrations/illust6.png)
 
 Now You should be able to see a somewhat similar window:
 
-![](illustrations/illust6.png)
+![](illustrations/illust7.png)
 
 Congratulation! We are *almost* done.
 
@@ -384,8 +390,6 @@ install drivers, we install them from the corresponding app.
 
 In the [Starting](#starting) section before creating a driver we first create an app project, and now we 
 will focus on it.
-
-
 
 
 ---
