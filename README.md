@@ -391,6 +391,8 @@ install drivers, we install them from the corresponding app.
 In the [Starting](#starting) section before creating a driver we first create an app project, and now we 
 will focus on it.
 
+*coming soon...*
+
 
 ---
 
@@ -401,11 +403,14 @@ will focus on it.
 
 ## Sources/literature:
 1. "MAC OS X Internals: A Systems Approach" by Amit Singh ([link](https://www.oreilly.com/library/view/mac-os-x/0321278542/))
-2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5)
+2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5) ([link](https://csc-knu.github.io/sys-prog/books/Andrew%20S.%20Tanenbaum%20-%20Modern%20Operating%20Systems.pdf))
 3. [Creating a Driver Using the DriverKit SDK](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
 4. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
 5. [Handling Keyboard Events from a Human Interface Device](https://developer.apple.com/documentation/hiddriverkit/handling_keyboard_events_from_a_human_interface_device)
 6. [Installing System Extensions and Drivers](https://developer.apple.com/documentation/systemextensions/installing_system_extensions_and_drivers)
+7. [DriverKit](https://developer.apple.com/documentation/driverkit)
+8. [Implementing Drivers, System Extensions, and Kexts](https://developer.apple.com/documentation/systemextensions/implementing_drivers_system_extensions_and_kexts)
+9. [Introduction to I/O Kit Fundamentals](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Introduction/Introduction.html)
 
 ## Arranged by:
 * [Daria Omelkina](https://github.com/dariaomelkina)
