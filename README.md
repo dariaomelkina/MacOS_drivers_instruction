@@ -112,7 +112,7 @@ We will try both approaches, starting with the newer, more secure, and, perhaps,
 
 ## Drivers using DriverKit framework:
 *This –– the first version of the instruction –– is based on the 
-[official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
+[official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) [3]
 for writing drivers with DriverKit SDK.* 
 
 ## Starting:
@@ -136,6 +136,13 @@ Now You should be able to see a somewhat similar window:
 Congratulation! We are *almost* done.
 
 ## Building up the project:
+Let's try to build a basic keyboard driver using the template we obtained just now and explore it at the same time. 
+For this task we will use parts of code from the official apple documentation [3].
+
+Firstly, what do we have in the template for the driver creation? Take a look at the directory, 
+which is called the same way as Your project itself:
+![](illustrations/illust5.png)
+
 
 
 ## Specific example:
@@ -146,7 +153,8 @@ Congratulation! We are *almost* done.
 ## Sources/literature:
 1. "MAC OS X Internals: A Systems Approach" by Amit Singh ([link](https://www.oreilly.com/library/view/mac-os-x/0321278542/))
 2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5)
-3. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
+3. [Creating a Driver Using the DriverKit SDK](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
+4. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
 
 
 ## Arranged by:
