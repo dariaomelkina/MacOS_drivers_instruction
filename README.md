@@ -8,7 +8,7 @@ Operational systems course project at UCU.
 ---
 
 ## Web version
-*coming soon...*
+*coming (moderately) soon...*
 
 ## Table of contents
 1. [Instruction](#instruction)
@@ -20,8 +20,8 @@ Operational systems course project at UCU.
     1. [More about I/O kit](#more-about-io-kit)
     1. [More about DriverKit](#more-about-driverkit)
 1. [Drivers using DriverKit framework](#drivers-using-driverkit-framework)
-    1. [Dext lifecycle](#dext-lifecycle)
-    1. [Building](#building)
+    1. [Starting](#starting)
+    1. [Building up the project](#building-up-the-project)
     1. [Specific example](#specific-example)
 1. [Drivers using I/O Kit collection of frameworks](#drivers-using-io-kit-collection-of-frameworks)
 1. [Sources/literature](#sourcesliterature)
@@ -55,7 +55,12 @@ The book, mentioned above provides a great overview of drivers architecture and 
 Here I will include some of the details, that might be important for understanding, when only starting working with
 drivers in general and macOS drivers in particular.
 
-Typical Unix systems provide a file-system-based user interface to devices—a user-space process addresses a device through device special files (or simply device files) that conventionally reside in the /dev/ directory. Older systems had a static /dev/, wherein the constituent device files were explicitly created or deleted, and device major numbers were statically assigned. Newer systems, including Mac OS X, manage devices more dynamically. For example, the Mac OS X device file system allows device files to be dynamically created or deleted and major numbers to be automatically assigned on device file creation.
+Usually, typical Unix systems use device special files (which reside in the /dev/ directory) for the user interface 
+with devices. Newer systems (macOS included) also manage devices more dynamically –– 
+they allow to dynamically create or delete (and automatically assign) these device files. 
+macOS provides device files for storage devices, serial devices, pseudo-terminals, and several pseudo-devices.
+
+*more to be added later...*
 
 ## macOS tools: 
 In this instruction, we will discuss two possible options, regarding the choice of tools, when writing drivers for 
@@ -63,8 +68,11 @@ macOS systems. The first is the I/O kit –– a collection of frameworks librar
 creating device drivers, and the second is the DriverKit –– a modernized replacement of the I/O Kit.
 
 ## More about I/O kit:
+The I/O Kit is a collection of both kernel-level and user-level software, that is used as a simplified driver 
+development mechanism. The I/O Kit also coordinates the use of device drivers. [1]
+
 When writing drivers for macOS using I/O Kit, the drivers is essentially an I/O Kit object, which manages a specific
-piece of hardware [[1](https://www.oreilly.com/library/view/mac-os-x/0321278542/)].
+piece of hardware. [1]
 
 ## More about DriverKit:
 *Information about DriverKit is retrieved from and based on the official presentation of the kit, available by the 
@@ -102,16 +110,33 @@ that devices supported on macOS 11 and later require DriverKit instead of I/O Ki
 
 We will try both approaches, starting with the newer, more secure, and, perhaps, an easier one –– DriverKit framework.
 
-
 ## Drivers using DriverKit framework:
-*This –– the first version of the instruction –– is based on the official presentation and demonstration of the 
-usage of the DriverKit, which is available at the following [link](https://developer.apple.com/videos/play/wwdc2019/702/).* 
+*This –– the first version of the instruction –– is based on the 
+[official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
+for writing drivers with DriverKit SDK.* 
 
-## Dext lifecycle:
-*coming soon...*
+## Starting:
+Delivering a driver using DriverKit requires creating a macOS app. All these drivers come with apps.
 
-## Building:
-*coming soon...*
+To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
+
+Open Xcode and create a new project (You can also add drivers code to a pre-existing project, Xcode gives an option for this):
+![](illustrations/illust1.png)
+
+Choose a DriverKit driver:
+![](illustrations/illust2.png)
+
+Choose options:
+![](illustrations/illust3.png)
+P.S. You can choose another name, which You would prefer, and specify Your organization identifier.
+
+Now You should be able to see a somewhat similar window:
+![](illustrations/illust4.png)
+
+Congratulation! We are *almost* done.
+
+## Building up the project:
+
 
 ## Specific example:
 

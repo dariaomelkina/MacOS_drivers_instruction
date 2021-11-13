@@ -1,0 +1,21 @@
+//
+//  DriverExample.iig
+//  DriverExample
+//
+//  Created by Dasha Omelkina on 13.11.2021.
+//
+
+#ifndef DriverExample_h
+#define DriverExample_h
+
+#include <Availability.h>
+#include <DriverKit/IOService.iig>
+
+class DriverExample: public IOService
+{
+public:
+    virtual kern_return_t
+    Start(IOService * provider) override;
+};
+
+#endif /* DriverExample_h */
