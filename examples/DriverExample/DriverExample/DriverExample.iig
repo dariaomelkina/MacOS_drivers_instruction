@@ -2,7 +2,6 @@
 //  DriverExample.iig
 //  DriverExample
 //
-//  Created by Dasha Omelkina on 13.11.2021.
 //
 
 #ifndef DriverExample_h
@@ -10,10 +9,14 @@
 
 #include <Availability.h>
 #include <DriverKit/IOService.iig>
+#include <HIDDriverKit/IOUserHIDEventService.iig>
 
-class DriverExample: public IOService
+class DriverExample: public IOUserHIDEventService
 {
 public:
+    virtual bool init() override;
+    virtual void free() override;
+    
     virtual kern_return_t
     Start(IOService * provider) override;
 };

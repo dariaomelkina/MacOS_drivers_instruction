@@ -22,7 +22,8 @@ Operational systems course project at UCU.
 1. [Drivers using DriverKit framework](#drivers-using-driverkit-framework)
     1. [Starting](#starting)
     1. [Building up the project](#building-up-the-project)
-    1. [Specific example](#specific-example)
+    1. [Information about the driver and matching](#information-about-the-driver-and-matching)
+    1. [Installing Your driver](#installing-your-driver)
 1. [Drivers using I/O Kit collection of frameworks](#drivers-using-io-kit-collection-of-frameworks)
 1. [Sources/literature](#sourcesliterature)
 
@@ -37,6 +38,7 @@ Let's get started and enter the magical world of the drivers creation, and May t
 * **Dext** – driver extension.
 * **Kext** – kernel extension.
 * **SDK** – Software Development Kit.
+* **HID** - 
 
 ## Introduction to drivers:
 Essentially, a driver is a specific code, which controls a corresponding I/O device, attached to the computer [2]. 
@@ -121,16 +123,21 @@ Delivering a driver using DriverKit requires creating a macOS app. All these dri
 To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
 
 Open Xcode and create a new project (You can also add drivers code to a pre-existing project, Xcode gives an option for this):
+
 ![](illustrations/illust1.png)
 
 Choose a DriverKit driver:
+
 ![](illustrations/illust2.png)
 
 Choose options:
+
 ![](illustrations/illust3.png)
+
 P.S. You can choose another name, which You would prefer, and specify Your organization identifier.
 
 Now You should be able to see a somewhat similar window:
+
 ![](illustrations/illust4.png)
 
 Congratulation! We are *almost* done.
@@ -141,11 +148,220 @@ For this task we will use parts of code from the official apple documentation [3
 
 Firstly, what do we have in the template for the driver creation? Take a look at the directory, 
 which is called the same way as Your project itself:
+
 ![](illustrations/illust5.png)
 
+* ***.cpp** –– is a file with main C++ source file.
+* ***.iig** –– is an IOKit interface generator header file. 
+* ***.entitlements** –– is  a default entitlements file. We will discuss what are entitlements. 
+and how to populate that file in the next section.
+* ***.plist** –– is a file with specific information to support the loading and installation of the driver.
+
+Let's begin to go through code of the Keyboard device from the documentation.
+Firstly, let's check out contents of the *.iig file (DriverExample.iig in my case):
+```c++
+#ifndef DriverExample_h
+#define DriverExample_h
+
+#include <Availability.h>
+#include <DriverKit/IOService.iig>
+
+class DriverExample: public IOService
+{
+public:
+    virtual kern_return_t
+    Start(IOService * provider) override;
+};
+
+#endif /* DriverExample_h */
+```
+It will look just like that. *(Note that this information applies on the November 13th of 2021, 
+and there can be slight changes of API in the millennia You currently live in)*
+
+Here, ```IOService``` –– is a a base class of all the drivers. We can continue working with it, but it would be better to 
+work with something more specific. There are different families of classes, provided by the DriverKit and for our case 
+we will choose a class for handling HID events. Why exactly HID (Human Interface Device)? It is because keyboard belongs 
+to such devices and we want a class to somehow obtain information on what happens with it. The exact class we would
+choose instead of the base one is the ```IOUserHIDEventService```.
+
+That is how class in Your *.iig file should look like now (plus the new additional include):
+```c++
+#include <HIDDriverKit/IOUserHIDEventService.iig>
+
+class DriverExample: public IOUserHIDEventService
+{
+public:
+    virtual kern_return_t
+    Start(IOService * provider) override;
+};
+```
+
+We will also need to implement some init and free methods, so we will now add them to header file, too. 
+That is how the whole file should look like now:
+```c++
+#ifndef DriverExample_h
+#define DriverExample_h
+
+#include <Availability.h>
+#include <DriverKit/IOService.iig>
+#include <HIDDriverKit/IOUserHIDEventService.iig>
+
+class DriverExample: public IOUserHIDEventService
+{
+public:
+    virtual bool init() override;
+    virtual void free() override;
+    
+    virtual kern_return_t
+    Start(IOService * provider) override;
+};
+
+#endif /* DriverExample_h */
+```
+
+Now let's move on to our main source code file –– Your *.cpp file (DriverExample.cpp in my case). It should currently 
+look like that:
+```c++
+#include <os/log.h>
+
+#include <DriverKit/IOUserServer.h>
+#include <DriverKit/IOLib.h>
+
+kern_return_t
+IMPL(DriverExample, Start)
+{
+    kern_return_t ret;
+    ret = Start(provider, SUPERDISPATCH);
+    os_log(OS_LOG_DEFAULT, "Hello World");
+    return ret;
+}
+```
+
+To work with a HID service we need some more includes, so let's add them:
+```c++
+#include <DriverKit/OSCollections.h>
+#include <HIDDriverKit/HIDDriverKit.h>
+```
 
 
-## Specific example:
+
+```c++
+struct HIDKeyboardDriver_IVars
+{
+    OSArray *elements;
+    
+    struct {
+        OSArray *elements;
+    } keyboard;
+};
+
+
+bool HIDKeyboardDriver::init()
+{
+    if (!super::init()) {
+        return false;
+    }
+    
+    ivars = IONewZero(HIDKeyboardDriver_IVars, 1);
+    if (!ivars) {
+        return false;
+    }
+    
+exit:
+    return true;
+}
+```
+(This code goes after the ```#include "YouProjectName.h"``` and before the implementation of the start of the service)
+
+We allocated instance variables for the keyboard driver, so now we need a method to free the memory from them. 
+(further examples of code are from/based on code from [5])
+```c++
+void HIDKeyboardDriver::free()
+{
+    if (ivars) {
+        OSSafeReleaseNULL(_elements);
+        OSSafeReleaseNULL(_keyboard.elements);
+    }
+    
+    IOSafeDeleteNULL(ivars, HIDKeyboardDriver_IVars, 1);
+    super::free();
+}
+```
+
+
+
+
+```c++
+kern_return_t
+IMPL(HIDKeyboardDriver, Start)
+{
+   kern_return_t ret;
+    
+   ret = Start(provider, SUPERDISPATCH);
+   if (ret != kIOReturnSuccess) {
+      Stop(provider, SUPERDISPATCH);
+      return ret;
+   }
+   
+   //
+   // Here the code of the startup tasks will go
+   //
+
+   RegisterService();
+    
+   return ret;
+}
+```
+
+
+
+
+[5]
+```c++
+kern_return_t
+IMPL(HIDKeyboardDriver, Start)
+{
+    kern_return_t ret;
+    
+    ret = Start(provider, SUPERDISPATCH);
+    if (ret != kIOReturnSuccess) {
+        Stop(provider, SUPERDISPATCH);
+        return ret;
+    }
+
+    os_log(OS_LOG_DEFAULT, "Hello from Your first DriverKit driver!");
+    
+    _elements = getElements();
+    if (!_elements) {
+        os_log(OS_LOG_DEFAULT, "Failed to get elements");
+        Stop(provider, SUPERDISPATCH);
+        return kIOReturnError;
+    }
+    
+    _elements->retain();
+
+    os_log(OS_LOG_DEFAULT, "The startup task is now finished.");
+    
+    RegisterService();
+    
+    return ret;
+}
+```
+To actually work with data from the keyboard, You would also need to parse arguments after retraining them. Parsing
+sample code is available at [5].
+
+
+Congratulations! That is actually Your first DriverKit driver! Even though it doesnt really do anything with data 
+from the keyboard it is, nevertheless, a driver. Yet it is not The End –– in order to run that driver You need to 
+perform some more, less code-oriented, steps.
+
+*more detailed instruction coming soon...*
+
+## Information about the driver and matching:
+*coming soon...*
+
+## Installing Your driver:
+*coming soon...*
 
 ## Drivers using I/O Kit collection of frameworks:
 *coming soon...*
@@ -155,7 +371,11 @@ which is called the same way as Your project itself:
 2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5)
 3. [Creating a Driver Using the DriverKit SDK](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
 4. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
+5. [Handling Keyboard Events from a Human Interface Device](https://developer.apple.com/documentation/hiddriverkit/handling_keyboard_events_from_a_human_interface_device)
 
 
 ## Arranged by:
-* Daria Omelkina
+* [Daria Omelkina](https://github.com/dariaomelkina)
+
+Special Thanks goes to everyone on the Apple team who created instruments, discussed in this example, 
+documentation for them and code samples, and made everything available on the web.
