@@ -38,7 +38,7 @@ Let's get started and enter the magical world of the drivers creation, and May t
 * **Dext** – driver extension.
 * **Kext** – kernel extension.
 * **SDK** – Software Development Kit.
-* **HID** - 
+* **HID** - Human Interface Device.
 
 ## Introduction to drivers:
 Essentially, a driver is a specific code, which controls a corresponding I/O device, attached to the computer [2]. 
@@ -112,14 +112,14 @@ that devices supported on macOS 11 and later require DriverKit instead of I/O Ki
 
 We will try both approaches, starting with the newer, more secure, and, perhaps, an easier one –– DriverKit framework.
 
+---
+
 ## Drivers using DriverKit framework:
 *This –– the first version of the instruction –– is based on the 
 [official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) [3]
-for writing drivers with DriverKit SDK.* 
+for writing drivers with DriverKit SDK and the sample code [5].* 
 
 ## Starting:
-Delivering a driver using DriverKit requires creating a macOS app. All these drivers come with apps.
-
 To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
 
 Open Xcode and create a new project (You can also add drivers code to a pre-existing project, Xcode gives an option for this):
@@ -243,10 +243,9 @@ To work with a HID service we need some more includes, so let's add them:
 #include <HIDDriverKit/HIDDriverKit.h>
 ```
 
-
-
+When the system will instantiate your driver's service class, it its init method. Let's add code of this method: 
 ```c++
-struct HIDKeyboardDriver_IVars
+struct DriverExample_IVars
 {
     OSArray *elements;
     
@@ -256,13 +255,13 @@ struct HIDKeyboardDriver_IVars
 };
 
 
-bool HIDKeyboardDriver::init()
+bool DriverExample::init()
 {
     if (!super::init()) {
         return false;
     }
     
-    ivars = IONewZero(HIDKeyboardDriver_IVars, 1);
+    ivars = IONewZero(DriverExample_IVars, 1);
     if (!ivars) {
         return false;
     }
@@ -273,27 +272,33 @@ exit:
 ```
 (This code goes after the ```#include "YouProjectName.h"``` and before the implementation of the start of the service)
 
-We allocated instance variables for the keyboard driver, so now we need a method to free the memory from them. 
-(further examples of code are from/based on code from [5])
+Here, during initialization time we allocate space for the driver's variables –– 
+elements and a keyboard (that contains elements) in our case 
+(here You can see variables in the ```DriverExample_IVars``` structure). 
+
+So, following this example, You would need to define a structure with variables, that You driver requires and
+and allocate this structure in the ```init()``` method.
+
+We allocated instance variables for the keyboard driver, so now we need a method to free the memory from them
+(further examples of code are from/based on code from [5]):
 ```c++
-void HIDKeyboardDriver::free()
+void DriverExample::free()
 {
     if (ivars) {
-        OSSafeReleaseNULL(_elements);
-        OSSafeReleaseNULL(_keyboard.elements);
+        OSSafeReleaseNULL(ivars->elements);
+        OSSafeReleaseNULL(ivars->keyboard.elements);
     }
     
-    IOSafeDeleteNULL(ivars, HIDKeyboardDriver_IVars, 1);
+    IOSafeDeleteNULL(ivars, DriverExample_IVars, 1);
     super::free();
 }
 ```
+This ```free()``` method will be called before unloading our service.
 
-
-
-
+Now, let's start organizing our ```Start``` method:
 ```c++
 kern_return_t
-IMPL(HIDKeyboardDriver, Start)
+IMPL(DriverExample, Start)
 {
    kern_return_t ret;
     
@@ -312,14 +317,15 @@ IMPL(HIDKeyboardDriver, Start)
    return ret;
 }
 ```
+This method will be called, when the system will be ready to process information from the device.
 
+In these method driver performs all the various start up tasks: variables initializations, changing device settings,
+allocating memory for data buffers, et cetera.
 
-
-
-[5]
+Now let's add some start up tasks to the code. This code is based on the sample from [5].
 ```c++
 kern_return_t
-IMPL(HIDKeyboardDriver, Start)
+IMPL(DriverExample, Start)
 {
     kern_return_t ret;
     
@@ -331,14 +337,14 @@ IMPL(HIDKeyboardDriver, Start)
 
     os_log(OS_LOG_DEFAULT, "Hello from Your first DriverKit driver!");
     
-    _elements = getElements();
-    if (!_elements) {
+    ivars->elements = getElements();
+    if (!ivars->elements) {
         os_log(OS_LOG_DEFAULT, "Failed to get elements");
         Stop(provider, SUPERDISPATCH);
         return kIOReturnError;
     }
     
-    _elements->retain();
+    ivars->elements->retain();
 
     os_log(OS_LOG_DEFAULT, "The startup task is now finished.");
     
@@ -347,13 +353,13 @@ IMPL(HIDKeyboardDriver, Start)
     return ret;
 }
 ```
-To actually work with data from the keyboard, You would also need to parse arguments after retraining them. Parsing
-sample code is available at [5].
+To actually work with data from the keyboard, You would also need to parse arguments after retaining them. Parsing
+sample code is also available at [5].
 
 
 Congratulations! That is actually Your first DriverKit driver! Even though it doesnt really do anything with data 
-from the keyboard it is, nevertheless, a driver. Yet it is not The End –– in order to run that driver You need to 
-perform some more, less code-oriented, steps.
+from the keyboard (it just retains it) it is, nevertheless, a driver. 
+Yet it is not The End –– in order to run that driver You need to perform some more, less code-oriented, steps.
 
 *more detailed instruction coming soon...*
 
@@ -363,8 +369,12 @@ perform some more, less code-oriented, steps.
 ## Installing Your driver:
 *coming soon...*
 
+---
+
 ## Drivers using I/O Kit collection of frameworks:
-*coming soon...*
+*coming (moderately) soon...*
+
+---
 
 ## Sources/literature:
 1. "MAC OS X Internals: A Systems Approach" by Amit Singh ([link](https://www.oreilly.com/library/view/mac-os-x/0321278542/))
