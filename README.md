@@ -7,9 +7,6 @@ Operational systems course project at UCU.
 
 ---
 
-## Web version
-*coming (moderately) soon...*
-
 ## Table of contents
 1. [Instruction](#instruction)
 1. [Annotations](#annotations)
@@ -110,7 +107,7 @@ Furthermore, starting with new versions of macOS, kexts will be deprecated.
 It is [officially stated](https://developer.apple.com/documentation/iokit/) by the Apple developer website, 
 that devices supported on macOS 11 and later require DriverKit instead of I/O Kit. 
 
-We will try both approaches, starting with the newer, more secure, and, perhaps, an easier one –– DriverKit framework.
+We will try the newer, more secure, and, perhaps, an easier approach –– DriverKit framework.
 
 ---
 
@@ -373,13 +370,19 @@ Congratulations! That is actually Your first DriverKit driver! Even though it do
 from the keyboard (it just retains it) it is, nevertheless, a driver. 
 Yet it is not The End –– in order to run that driver You need to perform some more, less code-oriented, steps.
 
-*more detailed instruction coming soon...*
-
 ## Information about the driver and matching:
 *coming soon...*
+[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!]()
+The plist file is used so that the system can understand for which device this driver is suitable. 
+That is, when the system looks for a driver to use for a particular device, 
+it will check whether the information from this file is appropriate.
+
+## Entitlements
+
+[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!]()
+
 
 ## Installing Your driver:
-*coming soon...*
 *Based on guidelines and recommendations from [6].*
 
 Now that we have our own little driver we might want to test it and use it. In order to do the we first need to
@@ -391,13 +394,101 @@ install drivers, we install them from the corresponding app.
 In the [Starting](#starting) section before creating a driver we first create an app project, and now we 
 will focus on it.
 
-*coming soon...*
+The example in [examples/HandlingKeyboardEventsFromAHumanInterfaceDevice](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice) 
+provides full code for the Swift app and code for the driver (partly discussed previously).
+
+Lets see how the app works and which part of code is related to the driver.
+
+[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!]()
 
 
----
+Now You can launch Your app and install the driver. 
 
-## Drivers using I/O Kit collection of frameworks:
-*coming (moderately) soon...*
+But what if You dont have entitlements from Apple, but still want to install the driver? 
+Visit the following, “debug” section.
+
+## Debug 
+If You try to install driver in a “safe mode” (with enabled SIP, should be usual state of Your machine) 
+without entitlements, discussed previously, You will get a following error:
+
+![](illustrations/xcode_provision_error.png)
+
+That's why, if You did not receive entitlements and just want to practice and debug Your driver 
+(or system extension, it will work for them, too) You should enter a developer mode and disable SIP. 
+To achieve this, perform following steps.
+
+To enable developer mode in terminal enter the following command:
+```
+systemextensionsctl developer on 
+```
+There might occur the following problem: 
+
+![](illustrations/dev_mode_on_error.png)
+
+It means that You have enabled SIP (System Integrity Protection).
+
+To disable it follow next steps (from article [Disabling and Enabling System Integrity Protection](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)):
+
+*(Although, before disabling the SIP, i would recommend to create a Time Machine and save in an external storage. 
+I recommend it for security reasons –– You might forget to turn the SIP back on and Your machine will possibly 
+be exposed to malicious code, etc.)*
+
+Firstly, enter the Recovery mode. In order to do it, press COMMAND and R just when turning on Your machine. 
+After entering the Recovery mode, go to utilities and choose Terminal. In this Terminal run the following command:
+```
+csrutil disable
+```
+
+Now restart the machine, in order for changes to be performed.
+
+Now after entering developer mode You should see the following message:
+
+![](illustrations/dev_mode_on.png)
+
+Now, running the app should not be a problem, and You will be able to debug the driver properly.
+
+*Important: Currently in my case a problem occurred with developer team, I am using a private team and I cannot build 
+the driver even in developer mode, so I am currently working on resolving this problem. With that said, following 
+tutorial should work well in theory, but it lacks practical examples. If I will be able to find a solution to my problem,
+I will include it here (because, it seems to me, that enrolling in the Apple Developer Program might an overkill
+for someone, who is just testing DriverKit as a hobby and/or education).*
+
+If You would like to run app from the terminal You can try following way (run from the directory, which contains the 
+project, for example [this one](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice)):
+```
+/usr/bin/xcodebuild -target HIDKeyboardApp  -configuration Debug
+```
+
+If there is a problem with running x-code like this, You might try the following fix (it will use the Xcode app):
+```
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```
+
+To check list of the extensions (and hopefully see Your driver here) in terminal enter the following command:
+```
+systemextensionsctl list
+```
+
+In order to debug Your program ([Debugging and Testing System Extensions](https://developer.apple.com/documentation/driverkit/debugging_and_testing_system_extensions)) 
+use lldb. To obtain PID of You process use ```ps```. Run lldb from the Terminal, and attach to the process  ```process attach --pid```.
+Now You should be able to debug Your program.
+
+After You are finished remember to exit the developer mode and **enable SIP!**
+
+To disable developer mode simply run the following command:
+```
+systemextensionsctl developer off
+```
+
+System Integrity Protection is extremely important to ensure that any malicious code doesn't damage Your system, 
+so enter the Recovery mode once again, enter the terminal and enable SIP by running the following command:
+```
+csrutil enable
+```
+
+Now restart the machine, in order for changes to be performed.
+
+That is it, now You have both Your app and driver debugged and ready for further adventures.
 
 ---
 
@@ -411,6 +502,8 @@ will focus on it.
 7. [DriverKit](https://developer.apple.com/documentation/driverkit)
 8. [Implementing Drivers, System Extensions, and Kexts](https://developer.apple.com/documentation/systemextensions/implementing_drivers_system_extensions_and_kexts)
 9. [Introduction to I/O Kit Fundamentals](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Introduction/Introduction.html)
+10. [Preparing the Development Team](https://developer.apple.com/library/archive/documentation/General/Conceptual/ApplicationDevelopmentOverview/CreateYourDevelopmentTeam/CreateYourDevelopmentTeam.html)
+11. [Non-macOS driver template example (Oracle)](https://docs.oracle.com/cd/E36784_01/html/E36866/eqbof.html#scrolltoc)
 
 ## Arranged by:
 * [Daria Omelkina](https://github.com/dariaomelkina)
