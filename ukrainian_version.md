@@ -231,3 +231,294 @@ IMPL(DriverExample, Start)
 }
 ```
 
+Для роботи з HID service нам потрібні ще деякі інклюди, тому давайте додамо їх:
+```c++
+#include <DriverKit/OSCollections.h>
+#include <HIDDriverKit/HIDDriverKit.h>
+```
+
+Коли система створить екземпляр service class'у вашого драйвера, вона викличе метод init. Додамо код цього методу:
+```c++
+struct DriverExample_IVars
+{
+    OSArray *elements;
+    
+    struct {
+        OSArray *elements;
+    } keyboard;
+};
+
+
+bool DriverExample::init()
+{
+    if (!super::init()) {
+        return false;
+    }
+    
+    ivars = IONewZero(DriverExample_IVars, 1);
+    if (!ivars) {
+        return false;
+    }
+    
+exit:
+    return true;
+}
+```
+(Цей код йде після ```#include "YouProjectName.h"``` і перед реалізацією Start)
+
+Тут під час ініціалізації ми виділяємо місце для змінних драйвера ––
+елементів і клавіатури (яка містить елементи) у нашому випадку
+(тут Ви можете побачити змінні в структурі ```DriverExample_IVars```).
+
+Отже, дотримуючись цього прикладу, вам потрібно буде визначити структуру зі змінними, які вимагає ваш драйвер і
+і алокувати пам'ять для цієї структури в методі ```init()```.
+
+Ми виділили змінні екземпляра для драйвера клавіатури, тому тепер нам потрібен метод для звільнення пам’яті від них
+(подальші приклади коду взято з/базуються на коді з [5]):
+```c++
+void DriverExample::free()
+{
+    if (ivars) {
+        OSSafeReleaseNULL(ivars->elements);
+        OSSafeReleaseNULL(ivars->keyboard.elements);
+    }
+    
+    IOSafeDeleteNULL(ivars, DriverExample_IVars, 1);
+    super::free();
+}
+```
+
+Цей метод ```free()``` буде викликано перед вивантаженням (unloading) нашого сервісу.
+
+Тепер давайте почнемо імплементовувати наш метод ```Start```:
+```c++
+kern_return_t
+IMPL(DriverExample, Start)
+{
+   kern_return_t ret;
+    
+   ret = Start(provider, SUPERDISPATCH);
+   if (ret != kIOReturnSuccess) {
+      Stop(provider, SUPERDISPATCH);
+      return ret;
+   }
+   
+   //
+   // Here the code of the startup tasks will go
+   //
+
+   RegisterService();
+    
+   return ret;
+}
+```
+
+Цей метод буде викликаний, коли система буде готова до обробки інформації з пристрою.
+
+У цьому методі драйвер виконує всі різноманітні завдання запуску: ініціалізацію змінних, зміну налаштувань пристрою,
+виділення пам'яті для буферів даних і так далі.
+
+Тепер давайте додамо кілька початкових завдань до коду. Цей код базується на зразку з [5].
+```c++
+kern_return_t
+IMPL(DriverExample, Start)
+{
+    kern_return_t ret;
+    
+    ret = Start(provider, SUPERDISPATCH);
+    if (ret != kIOReturnSuccess) {
+        Stop(provider, SUPERDISPATCH);
+        return ret;
+    }
+
+    os_log(OS_LOG_DEFAULT, "Hello from Your first DriverKit driver!");
+    
+    ivars->elements = getElements();
+    if (!ivars->elements) {
+        os_log(OS_LOG_DEFAULT, "Failed to get elements");
+        Stop(provider, SUPERDISPATCH);
+        return kIOReturnError;
+    }
+    
+    ivars->elements->retain();
+
+    os_log(OS_LOG_DEFAULT, "The startup task is now finished.");
+    
+    RegisterService();
+    
+    return ret;
+}
+```
+
+Щоб працювати з даними з клавіатури, вам також потрібно буде розпарсити аргументи після їх збереження. 
+Зразок коду парсингу також доступний у [5].
+
+Вітаю! Це (мабуть) ваш перший драйвер DriverKit! Хоча він насправді нічого не робить з даними
+з клавіатури (він просто зберігає її) це, тим не менш, драйвер.
+Але це не Кінець –– для того, щоб запустити цей драйвер, Вам потрібно виконати ще деякі кроки.
+
+## Інформація про драйвер і метчінг:
+*детальніша інформація незабаром...*
+
+Якщо коротко, файл plist, який знаходиться в проекті Xcode,
+використовується для того, щоб система могла зрозуміти, для якого пристрою підходить цей драйвер.
+Тобто, коли система шукає драйвер для певного пристрою,
+вона перевірить, чи підходить інформація з цього файлу для пристрою, чи ні.
+
+## Права (entitlements)
+*детальніша інформація незабаром...*
+
+Для того, щоб драйвер міг взаємодіяти з пристроями та сервісами, вам потрібно запросити
+права на розробку DriverKit у Apple.
+
+Система завантажує лише драйвери, які мають валідний набір прав, тому без них неможливо розробити повний продукт.
+Права DriverKit дають вашому драйверу дозвіл працювати як драйвер (перепрошую за тавтологію) і визначають тип обладнання, 
+яке підтримує ваш драйвер.
+
+Щоб виконати інсталяцію драйвера, ваша програма повинна мати права на для System Extensions.
+
+Щоб подати запит на отримання цих прав:
+1. Перейдіть на сторінку https://developer.apple.com/system-extensions/ і перейдіть за відповідним посиланням, щоб надіслати запит на отримання прав.
+2. Подайте заявку на отримання прав DriverKit.
+3. Надайте опис програм, які ви будете використовувати в проєкті.
+
+## Інсталяція драйвера:
+*На основі вказівок та рекомендацій з [6].*
+
+Тепер, коли у нас є власний невеличкий драйвер, ми, можливо, захочемо його протестувати та й використовувати. 
+Для того, щоб зробити це, нам спочатку потрібно інсталювати та активувати наш драйвер.
+
+Справа в тому, що всі драйвери надаються разом із застосунком, і для DriverKit наявність застосунку (програми) 
+є обов’язковою умовою. Тому ми не встановлюємо драйвери просто так, ми встановлюємо їх із відповідної програми.
+
+У розділі [Starting](#starting) перед створенням драйвера ми спочатку створюємо проєкт застосунку, тепер ми
+зосередиться на цьому.
+
+Надалі приклад стосуватиметься проєкту, наданого в якості зразку компанією Apple за наступним посиланням –– 
+https://developer.apple.com/documentation/hiddriverkit/handling_keyboard_events_from_a_human_interface_device.
+
+Приклад у [examples/HandlingKeyboardEventsFromAHumanInterfaceDevice](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice)
+надає повний код для програми, написаної на Swift, і код для драйвера (це частково обговорювалося раніше).
+
+Тож давайте подивимося, яка частина програми пов’язана з запуском драйвера:
+```
+// Activate the driver.
+let request = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: driverID, queue: DispatchQueue.main)
+request.delegate = self
+let extensionManager = OSSystemExtensionManager.shared
+extensionManager.submitRequest(request)
+```
+
+Ця частина коду використовується для активації вашого драйвера, і її можна знайти в 
+[AppDelegate.swift](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice/HIDKeyboardApp/AppDelegate.swift).
+
+Тепер ви можете запустити свою програму та встановити драйвер.
+
+Але що робити, якщо ви не маєте прав (entitlements) від Apple, але все одно хочете встановити драйвер?
+Про це йтиметься в наступному розділі –– «Дебаг».
+
+## Дебаг 
+Якщо ви спробуєте встановити драйвер у «безпечному режимі» (з увімкненим SIP, загалом це має бути звичайний стан вашого комп'ютера)
+без прав (entitlements), обговорюваних раніше, ви отримаєте таку помилку:
+
+![](illustrations/xcode_provision_error.png)
+
+Ось чому, якщо ви не отримали прав і просто хочете потренуватися та відлагодити свій драйвер
+(або системне розширення, їх це також стосується) Вам слід увійти в режим розробника та відключити SIP.
+Щоб зробити це, виконайте наступні дії:
+
+Щоб увімкнути режим розробника в терміналі, введіть таку команду:
+```
+systemextensionsctl developer on 
+```
+
+Тут може виникнути така проблема:
+
+![](illustrations/dev_mode_on_error.png)
+
+
+Це означає, що Ви маєте увімкнений SIP (захист цілісності системи).
+
+Щоб вимкнути його, виконайте наступні кроки (зі статті [Вимкнення та ввімкнення захисту цілісності системи](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)):
+
+*(Хоча перед тим, як вимкнути SIP, я б рекомендувала створити так звану Машину Часу (Time Machine) та зберегти на зовнішньому носії.
+Я рекомендую це з міркувань безпеки –– Ви можете забути знову ввімкнути SIP, і ваш комп’ютер, 
+можливо, буде уразливим до шкідливого коду тощо)*
+
+Спочатку увійдіть в режим Recovery. Щоб це зробити, натисніть COMMAND і R відразу під час увімкнення комп'ютера.
+Після входу в режим Recovery перейдіть до утиліт і виберіть «Термінал». У цьому терміналі запустіть таку команду:
+```
+csrutil disable
+```
+
+Тепер перезапустіть комп'ютер, щоб зміни відбулися.
+
+Тепер після входу в режим розробника ви повинні побачити таке повідомлення:
+
+![](illustrations/dev_mode_on.png)
+
+Тепер запуск програми не повинен бути проблемою, і ви зможете віддебажити драйвер.
+
+*Важливо: наразі в моєму випадку виникла проблема з developer team, я використовую приватну команду і не можу створювати
+драйвер навіть у режимі розробника, тому я зараз працюю над вирішенням цієї проблеми. З урахуванням сказаного, наступні 
+інструкції повинні добре працювати в теорії, але в них бракує практичних прикладів. Якщо я зможу знайти рішення своєї проблеми,
+я додам це сюди (тому що, як мені здається, реєстрація в Apple Developer Program може бути оверкілом
+для тих, хто просто тестує DriverKit як хобі та/або для навчання).*
+
+Якщо Ви хочете запустити програму з терміналу, ви можете спробувати наступним чином (запустити з диреторії, який містить
+проєкт, наприклад [з цієї](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice)):
+```
+/usr/bin/xcodebuild -target HIDKeyboardApp  -configuration Debug
+```
+
+Якщо є проблема із запуском xcode таким чином, ви можете спробувати такий фікс (воно використовуватиме програму Xcode):
+```
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```
+
+Щоб перевірити список розширень (і, сподіваюся, побачити тут ваш драйвер) у терміналі, введіть таку команду:
+```
+systemextensionsctl list
+```
+
+Щоб налагодити вашу програму ([Налагодження та тестування системних розширень](https://developer.apple.com/documentation/driverkit/debugging_and_testing_system_extensions))
+використовуйте lldb. Щоб отримати PID вашого процесу, використовуйте ```ps```. Запустіть lldb з терміналу та приєднайтесь до процесу ```process attach --pid```.
+Тепер ви зможете віддебажити свою програму.
+
+Після завершення не забудьте вийти з режиму розробника та **увімкнути SIP!**
+
+Щоб вимкнути режим розробника, просто виконайте таку команду:
+```
+systemextensionsctl developer off
+```
+
+System Integrity Protection надзвичайно важливе, щоб гарантувати, що якийсь шкідливий код не пошкодить Вашу систему,
+тому увійдіть у режим Recovery ще раз, увійдіть в Термінал та увімкніть SIP, виконавши таку команду:
+```
+csrutil enable
+```
+
+Тепер перезапустіть комп'ютер, щоб зміни були виконані.
+
+Ось і все, тепер у вас і ваш застосунок, і драйвер, вони налагоджені та готові до подальших пригод.
+
+---
+
+## Джерела/література:
+1. "MAC OS X Internals: A Systems Approach" by Amit Singh ([link](https://www.oreilly.com/library/view/mac-os-x/0321278542/))
+2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5) ([link](https://csc-knu.github.io/sys-prog/books/Andrew%20S.%20Tanenbaum%20-%20Modern%20Operating%20Systems.pdf))
+3. [Creating a Driver Using the DriverKit SDK](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) 
+4. [System Extensions and DriverKit video presentation](https://developer.apple.com/videos/play/wwdc2019/702/)
+5. [Handling Keyboard Events from a Human Interface Device](https://developer.apple.com/documentation/hiddriverkit/handling_keyboard_events_from_a_human_interface_device)
+6. [Installing System Extensions and Drivers](https://developer.apple.com/documentation/systemextensions/installing_system_extensions_and_drivers)
+7. [DriverKit](https://developer.apple.com/documentation/driverkit)
+8. [Implementing Drivers, System Extensions, and Kexts](https://developer.apple.com/documentation/systemextensions/implementing_drivers_system_extensions_and_kexts)
+9. [Introduction to I/O Kit Fundamentals](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Introduction/Introduction.html)
+10. [Preparing the Development Team](https://developer.apple.com/library/archive/documentation/General/Conceptual/ApplicationDevelopmentOverview/CreateYourDevelopmentTeam/CreateYourDevelopmentTeam.html)
+11. [Non-macOS driver template example (Oracle)](https://docs.oracle.com/cd/E36784_01/html/E36866/eqbof.html#scrolltoc)
+
+## Підготувала:
+* [Daria Omelkina](https://github.com/dariaomelkina)
+
+Особлива подяка висловлюється всім в команді Apple, хто створив інструменти, про які йдеться в цій інструкції,
+документацію для них і зразки коду, а також зробили все доступним в Інтернеті.

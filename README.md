@@ -252,7 +252,7 @@ To work with a HID service we need some more includes, so let's add them:
 #include <HIDDriverKit/HIDDriverKit.h>
 ```
 
-When the system will instantiate your driver's service class, it its init method. Let's add code of this method: 
+When the system will instantiate your driver's service class, it will call its init method. Let's add code of this method: 
 ```c++
 struct DriverExample_IVars
 {
@@ -328,7 +328,7 @@ IMPL(DriverExample, Start)
 ```
 This method will be called, when the system will be ready to process information from the device.
 
-In these method driver performs all the various start up tasks: variables initializations, changing device settings,
+In this method driver performs all the various start up tasks: variables initializations, changing device settings,
 allocating memory for data buffers, et cetera.
 
 Now let's add some start up tasks to the code. This code is based on the sample from [5].
