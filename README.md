@@ -409,10 +409,16 @@ will focus on it.
 The example in [examples/HandlingKeyboardEventsFromAHumanInterfaceDevice](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice) 
 provides full code for the Swift app and code for the driver (partly discussed previously).
 
-Lets see how the app works and which part of code is related to the driver.
+Lets see which part of app is related to the driver:
+```
+// Activate the driver.
+let request = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: driverID, queue: DispatchQueue.main)
+request.delegate = self
+let extensionManager = OSSystemExtensionManager.shared
+extensionManager.submitRequest(request)
+```
 
-[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!]()
-
+This part of code is used to activate Your driver and it can be found in [AppDelegate.swift](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice/HIDKeyboardApp/AppDelegate.swift).
 
 Now You can launch Your app and install the driver. 
 
