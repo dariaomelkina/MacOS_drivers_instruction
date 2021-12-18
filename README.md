@@ -371,16 +371,28 @@ from the keyboard (it just retains it) it is, nevertheless, a driver.
 Yet it is not The End –– in order to run that driver You need to perform some more, less code-oriented, steps.
 
 ## Information about the driver and matching:
-*coming soon...*
-[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!]()
-The plist file is used so that the system can understand for which device this driver is suitable. 
+*more details coming soon...*
+
+In short, the plist file, which is located in the Xcode project, 
+is used so that the system can understand for which device this driver is suitable. 
 That is, when the system looks for a driver to use for a particular device, 
-it will check whether the information from this file is appropriate.
+it will check whether the information from this file is appropriate for the device, or not.
 
 ## Entitlements
+*more details coming soon...*
 
-[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!]()
+In order for driver to interact with devices and services, You are required to request 
+the entitlement for DriverKit development from Apple.
 
+The system loads only drivers, which that have a valid set of entitlements, that is why You cannot develop a complete product without them. 
+The DriverKit entitlements give your driver permission to run as a driver and define the type of hardware Your driver supports.
+
+To perform  installation, your app must have the System Extension entitlement. 
+
+To request entitlement:
+1. Go to https://developer.apple.com/system-extensions/ and follow the link to request an entitlement.
+2. Apply for the DriverKit entitlement.
+3. Provide a description of the apps you’ll use.
 
 ## Installing Your driver:
 *Based on guidelines and recommendations from [6].*
