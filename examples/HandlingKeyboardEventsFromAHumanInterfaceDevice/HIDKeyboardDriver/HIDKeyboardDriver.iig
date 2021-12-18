@@ -1,0 +1,124 @@
+/*
+See LICENSE folder for this sample’s licensing information.
+
+Abstract:
+Declares the interface for the service object that dispatches keyboard events to the system.
+*/
+
+#ifndef HIDKeyboardDriver_h
+#define HIDKeyboardDriver_h
+
+#include <Availability.h>
+#include <DriverKit/IOService.iig>
+#include <HIDDriverKit/IOUserHIDEventService.iig>
+
+class IOHIDElement;
+
+/*!
+ * @class HIDKeyboardDriver
+ * */
+/// - Tag: HIDKeyboardDriver
+class HIDKeyboardDriver: public IOUserHIDEventService
+{
+public:
+    virtual bool init() override;
+    
+    virtual void free() override;
+    
+    virtual kern_return_t
+    Start(IOService * provider) override;
+    
+    /*!
+     * @function handleReport
+     *
+     * @abstract
+     * Receives the input data from the device, and dispatches events
+     * based on that data.
+     *
+     * @discussion
+     * The system calls this method each time it receives an updated
+     * input report from the device.
+     *
+     * @param timestamp
+     * The timestamp of the report.
+     *
+     * @param report
+     * The raw bytes that describe the report. Typically, you don't use
+     * this parameter. Instead, you iterate over the IOHIDElement objects that
+     * the event service provides. However, this parameter is available if you
+     * prefer to read the input report directly.
+     *
+     * @param reportLength
+     * The number of bytes in the report parameter.
+     *
+     * @param type
+     * The report type.
+     *
+     * @param reportID
+     * The unique report ID. Use this value to determine when an element
+     * contains a new value.
+     */
+    virtual void handleReport(uint64_t timestamp,
+                              uint8_t *report,
+                              uint32_t reportLength,
+                              IOHIDReportType type,
+                              uint32_t reportID) override LOCALONLY;
+    
+    /*!
+     * @function parseElements
+     *
+     * @abstract
+     * Parses the specified array of IOHIDElement elements, looking
+     * for elements that contain keyboard data.
+     *
+     * @param elements
+     * The array of elements to parse.
+     *
+     * @return
+     * true if any of the elements contain keyboard data.
+     */
+    virtual bool parseElements(OSArray *elements) LOCALONLY;
+    
+    /*!
+     * @function parseKeyboardElement
+     *
+     * @abstract
+     * Examines the element to determine if it contains keyboard-related data,
+     * returning true if it does.
+     *
+     * @discussion The method also saves a reference to the element in the
+     * object's instance variables.
+     *
+     * @param element
+     * The IOHIDElement object to parse.
+     *
+     * @return
+     * true if the element contains keyboard data, or false if it doesn't.
+     */
+    virtual bool parseKeyboardElement(IOHIDElement *element) LOCALONLY;
+    
+    /*!
+     * @function handleKeyboardReport
+     *
+     * @abstract
+     * Processes the subset of elements that contain keyboard data and dispatches
+     * any relevant events.
+     *
+     * @discussion
+     * By the time the driver calls this method, the parent class has already
+     * updated the IOHIDElement objects that you retrieved in your Start method.
+     * As a result, each element contains data from the most recent input report.
+     *
+     * @param timestamp
+     * The timestamp of the input report. Use this value to determine when an element
+     * contains a new value.
+     *
+     * @param reportID
+     * The report ID. Use this value to determine when an element
+     * contains a new value.
+     */
+    virtual void handleKeyboardReport(uint64_t timestamp,
+                                      uint32_t reportID) LOCALONLY;
+};
+
+#endif /* HIDKeyboardDriver_h */
