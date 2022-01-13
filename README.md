@@ -9,7 +9,7 @@ Operational systems course project at UCU.
 
 ## Table of contents
 1. [Instruction](#instruction)
-1. [Annotations](#annotations)
+1. [Definitions](#definitions)
 1. [Notions and acronyms](#notions-and-acronyms)
 1. [Introduction to drivers](#introduction-to-drivers)
 1. [Details on the task for macOS](#details-on-the-task-for-macos)
@@ -28,7 +28,7 @@ Operational systems course project at UCU.
 # Instruction:
 Let's get started and enter the magical world of the drivers creation, and May the Force be with You.
 
-## Annotations:
+## Definitions:
 *coming soon...*
 
 ## Notions and acronyms:
@@ -66,14 +66,14 @@ In this instruction, we will discuss two possible options, regarding the choice 
 macOS systems. The first is the I/O kit –– a collection of frameworks libraries, tools, and other resources for 
 creating device drivers, and the second is the DriverKit –– a modernized replacement of the I/O Kit.
 
-## More about I/O kit:
+### More about I/O kit:
 The I/O Kit is a collection of both kernel-level and user-level software, that is used as a simplified driver 
 development mechanism. The I/O Kit also coordinates the use of device drivers. [1]
 
 When writing drivers for macOS using I/O Kit, the drivers is essentially an I/O Kit object, which manages a specific
 piece of hardware. [1]
 
-## More about DriverKit:
+### More about DriverKit:
 *Information about DriverKit is retrieved from and based on the official presentation of the kit, available by the 
 following [link](https://developer.apple.com/videos/play/wwdc2019/702/) and on the 
 [official documentation](https://developer.apple.com/documentation/driverkit).* 
@@ -111,12 +111,23 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ---
 
-## Drivers using DriverKit framework:
+##  Drivers using DriverKit framework –– about:
+
+### Driver structure:
+
+### Class hierarchy:
+
+### C++ subset:
+
+### Briefly about communication with kernel:
+
+
+## Drivers using DriverKit framework –– example:
 *This –– the first version of the instruction –– is based on the 
 [official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) [3]
 for writing drivers with DriverKit SDK and the sample code [5].* 
 
-## Starting:
+### Starting:
 To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
 
 We will add the driver to a pre-existing project, because drivers, created with DriverKit require an app to install and 
@@ -151,7 +162,7 @@ Now You should be able to see a somewhat similar window:
 
 Congratulation! We are *almost* done.
 
-## Building up the project:
+### Building up the project:
 Let's try to build a basic keyboard driver using the template we obtained just now and explore it at the same time. 
 For this task we will use parts of code from the official apple documentation [3].
 
@@ -370,7 +381,7 @@ Congratulations! That is actually Your first DriverKit driver! Even though it do
 from the keyboard (it just retains it) it is, nevertheless, a driver. 
 Yet it is not The End –– in order to run that driver You need to perform some more, less code-oriented, steps.
 
-## Information about the driver and matching:
+### Information about the driver and matching:
 *more details coming soon...*
 
 In short, the plist file, which is located in the Xcode project, 
@@ -378,7 +389,7 @@ is used so that the system can understand for which device this driver is suitab
 That is, when the system looks for a driver to use for a particular device, 
 it will check whether the information from this file is appropriate for the device, or not.
 
-## Entitlements
+### Entitlements
 *more details coming soon...*
 
 In order for driver to interact with devices and services, You are required to request 
@@ -394,7 +405,7 @@ To request entitlement:
 2. Apply for the DriverKit entitlement.
 3. Provide a description of the apps you’ll use.
 
-## Installing Your driver:
+### Installing Your driver:
 *Based on guidelines and recommendations from [6].*
 
 Now that we have our own little driver we might want to test it and use it. In order to do the we first need to
@@ -425,7 +436,7 @@ Now You can launch Your app and install the driver.
 But what if You dont have entitlements from Apple, but still want to install the driver? 
 Visit the following, “debug” section.
 
-## Debug 
+### Debug 
 If You try to install driver in a “safe mode” (with enabled SIP, should be usual state of Your machine) 
 without entitlements, discussed previously, You will get a following error:
 
@@ -508,6 +519,8 @@ Now restart the machine, in order for changes to be performed.
 
 That is it, now You have both Your app and driver debugged and ready for further adventures.
 
+## Additionaly:
+
 ---
 
 ## Sources/literature:
@@ -526,5 +539,5 @@ That is it, now You have both Your app and driver debugged and ready for further
 ## Arranged by:
 * [Daria Omelkina](https://github.com/dariaomelkina)
 
-Special Thanks goes to everyone on the Apple team who created instruments, discussed in this example, 
+Special Thanks go to everyone on the Apple team who created instruments, discussed in this example, 
 documentation for them and code samples, and made everything available on the web.

@@ -165,3 +165,4 @@ DerivedData/
 # Custom from me
 .idea/
 notes.md
+.ipynb_checkpoints/
