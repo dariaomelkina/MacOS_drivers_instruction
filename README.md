@@ -27,10 +27,12 @@ Operational systems course project at UCU.
 1. [Sources/literature](#sourcesliterature)
 
 ---
-# Instruction:
+# :coffee: Instruction:
 Let's get started and enter the magical world of the drivers creation, and May the Force be with You.
 
+---
 ## Introduction:
+Before diving into more specific tools and examples, let's check some of the definitions and brief details about drivers and their development.
 
 ### Definitions:
 *coming soon...*
@@ -110,7 +112,8 @@ there are several advantages to using System Extensions and DriverKit:
 
 Furthermore, starting with new versions of macOS, kexts will be deprecated. 
 It is [officially stated](https://developer.apple.com/documentation/iokit/) by the Apple developer website, 
-that devices supported on macOS 11 and later require DriverKit instead of I/O Kit. 
+that devices supported on macOS 11 and later require DriverKit instead of I/O Kit. *For some details on audio drivers check out this
+[video-tutorial](https://developer.apple.com/videos/play/wwdc2021/10190/)*
 
 We will try the newer, more secure, and, perhaps, an easier approach –– DriverKit framework.
 
@@ -123,7 +126,9 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ### C++ subset:
 
-### Briefly about communication with kernel:
+### Briefly about internal workflow:
+
+### Basic instruction outlay:
 
 ---
 ## Drivers using DriverKit framework –– example:
@@ -480,11 +485,7 @@ Now after entering developer mode You should see the following message:
 
 Now, running the app should not be a problem, and You will be able to debug the driver properly.
 
-*Important: Currently in my case a problem occurred with developer team, I am using a private team and I cannot build 
-the driver even in developer mode, so I am currently working on resolving this problem. With that said, following 
-tutorial should work well in theory, but it lacks practical examples. If I will be able to find a solution to my problem,
-I will include it here (because, it seems to me, that enrolling in the Apple Developer Program might an overkill
-for someone, who is just testing DriverKit as a hobby and/or education).*
+*Important: Currently in my case a problem occurred with developer team, I am using a private team and I cannot build the driver even in the developer mode, because building driver requires Developer ID, which I don't have. With that said, following tutorial should work well in theory (it is based on the official tutorial for debugging), but it lacks practical examples. For details on getting the Developer ID for such tasks visit "Additionaly" section.*
 
 If You would like to run app from the terminal You can try following way (run from the directory, which contains the 
 project, for example [this one](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice)):
@@ -525,9 +526,11 @@ That is it, now You have both Your app and driver debugged and ready for further
 
 ---
 ## Additionaly:
+To be able to build driver (and have more access in macOS development in general), You need to have a Developer ID. Without it You still can develop apps (using Your Apple ID You will have a personal development team), but not the ones, which work with System Extentions.
+
+To obtain the Developer ID certificate (more info [here](https://developer.apple.com/support/developer-id/)) You will need to enroll in the [Apple Developer Program](https://developer.apple.com/programs/) (or Apple Developer Enterprise Program). Here is the enrollment [link](https://developer.apple.com/programs/enroll/), check wich type of enrollment You need/prefer and follow the link in the bottom of the page. Bear in mind, that You still need an Apple ID for that, and the program costs 99$ (price as for January, 2022).
 
 ---
-
 ## Sources/literature:
 1. "MAC OS X Internals: A Systems Approach" by Amit Singh ([link](https://www.oreilly.com/library/view/mac-os-x/0321278542/))
 2. Modern Operating Systems, Andrew S. Tanenbaum (mostly chapter 5) ([link](https://csc-knu.github.io/sys-prog/books/Andrew%20S.%20Tanenbaum%20-%20Modern%20Operating%20Systems.pdf))
