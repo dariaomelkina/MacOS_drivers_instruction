@@ -8,6 +8,8 @@ Operational systems course project at UCU.
 ---
 
 ## Table of contents
+*Needs revision*
+
 1. [Instruction](#instruction)
 1. [Definitions](#definitions)
 1. [Notions and acronyms](#notions-and-acronyms)
@@ -28,16 +30,18 @@ Operational systems course project at UCU.
 # Instruction:
 Let's get started and enter the magical world of the drivers creation, and May the Force be with You.
 
-## Definitions:
+## Introduction:
+
+### Definitions:
 *coming soon...*
 
-## Notions and acronyms:
+### Notions and acronyms:
 * **Dext** – driver extension.
 * **Kext** – kernel extension.
 * **SDK** – Software Development Kit.
 * **HID** - Human Interface Device.
 
-## Introduction to drivers:
+### Introduction to drivers:
 Essentially, a driver is a specific code, which controls a corresponding I/O device, attached to the computer [2]. 
 In other words, drivers can be viewed as a bridge between computer peripherals and the rest of the system. [3] 
 So, it is a mean of communication and control. 
@@ -45,7 +49,7 @@ So, it is a mean of communication and control.
 Andrew Tanenbaum’s “Modern Operating Systems” [2] provide a good overview for the drivers, which run in the kernel 
 space, but in this tutorial we will mostly focus on the drivers, which run in the user space. 
 
-## Details on the task for macOS:
+### Details on the task for macOS:
 As told in Amit Singh's "Mac OS X Internals. A Systems Approach" [1], even though usually writing drivers can be considered
 difficult, the macOS driver architecture is helpful in this regard. One of the most appealing advantages is that it
 supports user space drivers (importance of which we will discuss a little later –– in the DriverKit section).
@@ -61,6 +65,7 @@ macOS provides device files for storage devices, serial devices, pseudo-terminal
 
 *more to be added later...*
 
+---
 ## macOS tools: 
 In this instruction, we will discuss two possible options, regarding the choice of tools, when writing drivers for 
 macOS systems. The first is the I/O kit –– a collection of frameworks libraries, tools, and other resources for 
@@ -110,7 +115,6 @@ that devices supported on macOS 11 and later require DriverKit instead of I/O Ki
 We will try the newer, more secure, and, perhaps, an easier approach –– DriverKit framework.
 
 ---
-
 ##  Drivers using DriverKit framework –– about:
 
 ### Driver structure:
@@ -121,7 +125,7 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ### Briefly about communication with kernel:
 
-
+---
 ## Drivers using DriverKit framework –– example:
 *This –– the first version of the instruction –– is based on the 
 [official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) [3]
@@ -519,6 +523,7 @@ Now restart the machine, in order for changes to be performed.
 
 That is it, now You have both Your app and driver debugged and ready for further adventures.
 
+---
 ## Additionaly:
 
 ---
