@@ -312,13 +312,18 @@ it will check whether the information from this key is appropriate for the devic
 Also, for dext update You should change vetsion in the plist, so the system understands, that the driver should be updated.
 
 ### Basic development steps:
+1. Create an App project in Xcode.
+1. Add a separate target to it, for which use DriverKit Driver template from Xcode.
+1. Choose which DriverKit family suits You device best.
+1. Complete class definition in the .iig file.
+1. Define instance variables and implement methods from the .iig file in the .cpp file.
+1. Request entitlements for Your dext and add them to the .entitlements file.
+1. Complete Info.plist file.
+1. Create You App, and add activationRequest to it.
+1. Lauch App.
+1. Debug/use dext.
 
-
-
-
-*soon**
-
-
++ You will need to obtain a Developer ID or another fitting certificate for dext development.
 
 ---
 ## Drivers using DriverKit framework –– example:
