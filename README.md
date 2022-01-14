@@ -139,7 +139,16 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ### Driver structure:
 
-### Class hierarchy:
+### Apps and system extentions relationship:
+Each system extention (including dexts, which are our main concern) comes with with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extention. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
+
+The ```activationRequest``` makes extention available. It can be activated in the App launch, but it is not mandatory. For example, Your app might have some kind of intercation with the user, before install extention (it might ask for user's permission, etc). From the moment of activation the lifecycle of the driver extention will be managed by the system itself. It, for example, means that dext will start the moment it is needed –– when a matching device is connected to the system, etc.
+
+In the example, available in the repository, there is also example of an App, written in Swift.
+
+### Classes in DriverKit:
+
+DriverKit supports different device familes. More on each family [here](https://developer.apple.com/documentation/kernel/hardware_families). In short, they include such family types as USB, Network, Serial, Audio, and Graphics.
 
 ### Restriction of the C++ subset:
 As it is described in the [documentation](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF105) C++ is restricted for the I/O Kit (so only a subset of the language can be used in driver development). I/O Kit does not allow:
