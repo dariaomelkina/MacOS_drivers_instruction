@@ -31,6 +31,11 @@ Operational systems course project at UCU.
 Let's get started and enter the magical world of the drivers creation, and May the Force be with You.
 
 ---
+*This instruction is mostly based on the 
+[official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) [3]
+for writing drivers with DriverKit SDK, DriverKit documentation on [Apple Developer website](https://developer.apple.com/documentation/driverkit) and the sample code [5].* 
+
+---
 ## Introduction:
 Before diving into more specific tools and examples, let's check some of the definitions and brief details about drivers and their development.
 
@@ -57,7 +62,7 @@ Before diving into more specific tools and examples, let's check some of the def
 * **NIC**
 * **USB**
 * **IIG** - I/O Kit Interface generator
-* ****
+* **RTTI** - runtime type information
 * ****
 * ****
 
@@ -147,8 +152,46 @@ As it was already said, dexts work in the userspace, so their workflow is a bit 
 For more detailed information on that topic check video-presentation [4] of the DriverKit approximately from the 12th minute.
 
 ### Creating driver extention:
+As it was told before, DriverKit API is based on the the [I/O Kit API](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Introduction/Introduction.html#//apple_ref/doc/uid/TP0000011-CH204-TPXREF101). This new, DriverKit API, is limited, it has **no direct access** to file system, networking and IPC. Some of it's classes are based on corresponding I/O Kit classes, some are completely new (for more info visit [Classes in DriverKit](#classes-in-driverkit) section).
+
+To create a dext project, You can use a template from the Xcode. It will be a great starting point for development of Your driver.
+
+DriverKit uses classes for dext development. So, to start creating driver we should define its class. There is a special file, which holds class definition for a driver. It is the **.iig file**, interface of the driver is described in it. Such files are processed by the IIG (I/O Kit Interface Generator) tool. This file consists of a class with standard C/C++ types and structure definitions (althouth it has some new attributes for messaging and dispatch queues that allow communication with separate address spaces), and it is compiled using Clang compiler.
+
+The basic class definition requires You to override following methods (although the most basic .iig file contents from the Xcode template provides only Start method, so this others are not mandatory but are still needed in most cases):
+```
+{
+    init()
+    
+    Start()
+    
+    Stop()
+    
+    free()
+}
+```
+
+Example of the class definition:
+```c++
+class Example: public IOService
+{
+public:
+    virtual bool init() override;
+    
+    virtual kern_return_t Start(IOService * provider) override;
+    
+    virtual kern_return_t Stop(IOService * provider) override;
+    
+    virtual void free() override;
+    
+};
+```
+
+Depending on the device You are writing driver for, You will want to use different families of drivers and hence You will need to implement more specific and custom methods. For example, if You want to write a driver for a keyboard, You will need to use HIDDriverKit framework and write different methods such as parseKeyboardElement, handleKeyboardReport, etc. They will usually have the  LOCALONLY macro, which means that they will run only locally in this dext's process space.
 
 
+
+For information on debug visit [Debug](#debug) section, which is a part of example/case-study part of the instruction.
 
 ### Apps and system extentions relationship:
 Each system extention (including dexts, which are our main concern) comes with with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extention. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
@@ -181,6 +224,13 @@ Here are some examples of such classes:
 
 More classes [here](https://developer.apple.com/documentation/driverkit).
 
+A little about some of the classes functionality/meaning:
+* IOService is one of the main classes in the kit, it is the base class for Your driver, it has an I/O Kit lifecycle API: Start/Stop/Terminate.
+* IODispatchQueue is important, because all the methods are invoked on a queue and drivers control their own queues.
+* IODispatchQueue, IOInterruptDispatchSource, IOTimerDispatchSource, IODispatchQueue::DispatchSync, IODispatchQueue::DispatchAsync are also used for event handling.
+* OSAction class (for C Function Pointer representation) encapsulates callback from I/O Kit API.
+* etc
+
 DriverKit supports different device familes. More on each family [here](https://developer.apple.com/documentation/kernel/hardware_families). In short, they include such family types as USB, Network, Serial, Audio, and Graphics.
 
 ### Restriction of the C++ subset:
@@ -190,7 +240,7 @@ As it is described in the [documentation](https://developer.apple.com/library/ar
 * templates
 * RTTI (runtime type information)
 
-I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extentions do not). It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
+I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extentions do not), so there is no such limit for it. It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
 
 Other limits, which were discussed previosly, are API limits: there is no direct access to file system, networking and IPC.
 
@@ -223,13 +273,12 @@ is used so that the system can understand for which device this driver is suitab
 That is, when the system looks for a driver to use for a particular device, 
 it will check whether the information from this file is appropriate for the device, or not.
 
-### Basic instruction outlay:
+### Basic development steps:
+
 
 ---
 ## Drivers using DriverKit framework –– example:
-*This –– the first version of the instruction –– is based on the 
-[official guidelines](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) [3]
-for writing drivers with DriverKit SDK and the sample code [5].* 
+An example, or case-study of DriverKit dext development.
 
 ### Starting:
 To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
@@ -517,7 +566,7 @@ Now You can launch Your app and install the driver.
 But what if You dont have entitlements from Apple, but still want to install the driver? 
 Visit the following, “debug” section.
 
-### Debug 
+### Debug: 
 If You try to install driver in a “safe mode” (with enabled SIP, should be usual state of Your machine) 
 without entitlements, discussed previously, You will get a following error:
 
