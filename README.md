@@ -43,9 +43,9 @@ Before diving into more specific tools and examples, let's check some of the def
 *coming soon...*
 * **driver**
 * **tailored runtime**
-* ****
-* ****
-* ****
+* **instantiation**
+* **definition**
+* **initialization**
 * ****
 * ****
 * ****
@@ -176,7 +176,7 @@ The basic class definition requires You to override following methods (although 
 
 Example of the class definition:
 ```c++
-class Example: public IOService
+class ExampleDriver: public IOService
 {
 public:
     virtual bool init() override;
@@ -192,7 +192,26 @@ public:
 
 Depending on the device You are writing driver for, You will want to use different families of drivers and hence You will need to implement more specific and custom methods. For example, if You want to write a driver for a keyboard, You will need to use HIDDriverKit framework and write different methods such as parseKeyboardElement, handleKeyboardReport, etc. They will usually have the  LOCALONLY macro, which means that they will run only locally in this dext's process space.
 
+So, different families have different class definitions and implemenations.
 
+Moving to implementations: class methods implementations reside in the **.cpp file** with the same name as Your dext project (and with the same name as the .iig file, too). Here You implement methods from the class definition. But firstly, You will need to define a structure with Instance variable definitions. These will be variables, memory for which will be allocated during the initialization. 
+
+Here is a little example how the structure will look like:
+```c++
+struct ExampleDriver_IVars
+{
+    OSBoolean example_variable1;
+    
+    OSString example_variable2;
+};
+```
+For some kind of a more complicated device (for example, keyboard), You will need variables which will hold keyboard elements in an OSArray, etc. In short, different families –– different required variables.
+
+Now, moving to methods implementations, here is what each method does (not including methods, specific to different devices and families):
+1. init() – here memory for instance variables must be allocated (so You allocate structure ..._IVars)
+2. free() - 
+3. Start() - 
+4. Stop() - 
 
 
 
@@ -245,6 +264,8 @@ DriverKit supports different device familes. So, there are different frameworks 
 * SerialDriverKit ([link](https://developer.apple.com/documentation/serialdriverkit))
 * PCIDriverKit ([link](https://developer.apple.com/documentation/pcidriverkit))
 
+Considering their functionality, different families have different class definitions and implemenations.
+
 ### Restriction of the C++ subset:
 As it is described in the [documentation](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF105) C++ is restricted for the I/O Kit (so only a subset of the language can be used in driver development). I/O Kit does not allow:
 * exceptions
@@ -267,7 +288,7 @@ The system loads only drivers, which that have a valid set of entitlements, that
 
 To perform  installation, your app must have the System Extension entitlement. In short, You require following entitlements:
 * com.apple.developer.driverkit (for all drivers)
-* transport entitlement (they are individual for device types, there is example for USB: com.apple.developer.driverkit.transport.usb)
+* transport entitlement, to take control of the device (they are individual for device types, there is example for USB: com.apple.developer.driverkit.transport.usb)
 * family entitlement (specific for different families, there is example for HID: com.apple.developer.driverkit.family.hid.device)
 
 To request entitlement:
