@@ -149,6 +149,7 @@ For more detailed information on that topic check video-presentation [4] of the 
 ### Creating driver extention:
 
 
+
 ### Apps and system extentions relationship:
 Each system extention (including dexts, which are our main concern) comes with with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extention. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
 
@@ -157,6 +158,28 @@ The ```activationRequest``` makes extention available. It can be activated in th
 In the example, available in the repository, there is also example of an App, written in Swift.
 
 ### Classes in DriverKit:
+DriverKit uses different classes for the dext development. There are classes for the drivers themselves, for memory operations, queues, interrupts, timers, etc.
+
+Classes in DriverKit are either substitutes for corresponding classes from I/O Kit, similar to them, or completely new.
+
+Here are some examples of such classes:
+1. Similar to I/O Kit:
+    * IOService
+    * IOMemoryDescriptor
+    * IOBufferMemoryDescriptor
+    * and others...
+2. Replace other classes from I/O Kit:
+    * IODispatchQueue
+    * IOInterruptDispatchSource
+    * IOTimerDispatchSource
+    * IODispatchQueue::DispatchSync
+    * IODispatchQueue::DispatchAsync
+    * and others...
+3. Completely new classes:
+    * OSAction
+    * and others...
+
+More classes [here](https://developer.apple.com/documentation/driverkit).
 
 DriverKit supports different device familes. More on each family [here](https://developer.apple.com/documentation/kernel/hardware_families). In short, they include such family types as USB, Network, Serial, Audio, and Graphics.
 
@@ -169,7 +192,7 @@ As it is described in the [documentation](https://developer.apple.com/library/ar
 
 I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extentions do not). It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
 
-Other limits, which were discussed previosly, are 
+Other limits, which were discussed previosly, are API limits: there is no direct access to file system, networking and IPC.
 
 On a further note, the default language for the DriverKit API is C++17.
 
