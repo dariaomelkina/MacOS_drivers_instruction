@@ -63,6 +63,9 @@ Before diving into more specific tools and examples, let's check some of the def
 * **USB**
 * **IIG** - I/O Kit Interface generator
 * **RTTI** - runtime type information
+* **PCI** - Peripheral Component Interconnect
+* ****
+* ****
 * ****
 * ****
 
@@ -191,6 +194,9 @@ Depending on the device You are writing driver for, You will want to use differe
 
 
 
+
+
+
 For information on debug visit [Debug](#debug) section, which is a part of example/case-study part of the instruction.
 
 ### Apps and system extentions relationship:
@@ -231,7 +237,13 @@ A little about some of the classes functionality/meaning:
 * OSAction class (for C Function Pointer representation) encapsulates callback from I/O Kit API.
 * etc
 
-DriverKit supports different device familes. More on each family [here](https://developer.apple.com/documentation/kernel/hardware_families). In short, they include such family types as USB, Network, Serial, Audio, and Graphics.
+DriverKit supports different device familes. So, there are different frameworks for different families, such as:
+* NetworkingDriverKit ([link](https://developer.apple.com/documentation/networkingdriverkit))
+* HIDDriverKit ([link](https://developer.apple.com/documentation/hiddriverkit)) (used in the example with the keyboard)
+* USBDriverKit ([link](https://developer.apple.com/documentation/usbdriverkit))
+* USBSerialDriverKit ([link](https://developer.apple.com/documentation/usbserialdriverkit))
+* SerialDriverKit ([link](https://developer.apple.com/documentation/serialdriverkit))
+* PCIDriverKit ([link](https://developer.apple.com/documentation/pcidriverkit))
 
 ### Restriction of the C++ subset:
 As it is described in the [documentation](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF105) C++ is restricted for the I/O Kit (so only a subset of the language can be used in driver development). I/O Kit does not allow:
