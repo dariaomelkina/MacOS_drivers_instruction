@@ -44,6 +44,7 @@ Before diving into more specific tools and examples, let's check some of the def
 * ****
 * ****
 * ****
+* **nub** – is an object, which represents a communication channel for a device. (more [here](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/ArchitectOverview/ArchitectOverview.html#//apple_ref/doc/uid/TP0000013-BEHDCDDC)) 
 
 ### Acronyms:
 *coming soon...*
@@ -68,6 +69,8 @@ So, it is a mean of communication and control.
 Andrew Tanenbaum’s “Modern Operating Systems” [2] provide a good overview for the drivers, which run in the kernel 
 space, but in this tutorial we will mostly focus on the drivers, which run in the user space. 
 
+If You would like to check the [I/O Registry](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/TheRegistry/TheRegistry.html) (it contains a dynamic "tree" with nubs and drivers) of Your system, You can run the following command in terminal: ```ioreg```.
+
 ### Details on the task for macOS:
 As told in Amit Singh's "Mac OS X Internals. A Systems Approach" [1], even though usually writing drivers can be considered
 difficult, the macOS driver architecture is helpful in this regard. One of the most appealing advantages is that it
@@ -82,8 +85,6 @@ with devices. Newer systems (macOS included) also manage devices more dynamicall
 they allow to dynamically create or delete (and automatically assign) these device files. 
 macOS provides device files for storage devices, serial devices, pseudo-terminals, and several pseudo-devices.
 
-*more to be added later...*
-
 ---
 ## macOS tools: 
 In this instruction, we will discuss two possible options, regarding the choice of tools, when writing drivers for 
@@ -96,6 +97,8 @@ development mechanism. The I/O Kit also coordinates the use of device drivers. [
 
 When writing drivers for macOS using I/O Kit, the drivers is essentially an I/O Kit object, which manages a specific
 piece of hardware. [1]
+
+If You are interested in I/O Kit, You can check its [official documentation](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF101).
 
 ### More about DriverKit:
 *Information about DriverKit is retrieved from and based on the official presentation of the kit, available by the 
@@ -136,8 +139,15 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ---
 ##  Drivers using DriverKit framework –– about:
+In this part we will continue discussing DriverKit, but in more detail. So, in DriverKit Dext (Driver Extention) –– is a system extention, which controls hardware and is available to the entire system. There are even some DriverKit drivers, which come with Catalina, so even tho this kit is quite new, it is approved and officially used by Catalina system developers.
 
-### Driver structure:
+### How dext works in the system:
+As it was already said, dexts work in the userspace, so their workflow is a bit different from the kernel extentions. In short, when a device appears (for wich we created or already have a driver extention), I/O Kit matching (which is already prewritten) creates a kernel service to represent Your service. Then system starts a process for the driver (for example, written by You). There will be a new instance of driver for each devices (so a new process is started for each of them). 
+
+For more detailed information on that topic check video-presentation [4] of the DriverKit approximately from the 12th minute.
+
+### Creating driver extention:
+
 
 ### Apps and system extentions relationship:
 Each system extention (including dexts, which are our main concern) comes with with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extention. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
@@ -159,9 +169,36 @@ As it is described in the [documentation](https://developer.apple.com/library/ar
 
 I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extentions do not). It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
 
+Other limits, which were discussed previosly, are 
+
 On a further note, the default language for the DriverKit API is C++17.
 
-### Briefly about internal workflow:
+### Entitlements:
+Entitlements are required as one of the security measures.
+
+In order for driver to interact with devices and services, You are required to request the entitlement for DriverKit development from Apple.
+
+The system loads only drivers, which that have a valid set of entitlements, that is why You cannot develop a complete product without them. The DriverKit entitlements give your driver permission to run as a driver and define the type of hardware Your driver supports.
+
+To perform  installation, your app must have the System Extension entitlement. In short, You require following entitlements:
+* com.apple.developer.driverkit (for all drivers)
+* transport entitlement (they are individual for device types, there is example for USB: com.apple.developer.driverkit.transport.usb)
+* family entitlement (specific for different families, there is example for HID: com.apple.developer.driverkit.family.hid.device)
+
+To request entitlement:
+1. Go to https://developer.apple.com/system-extensions/ and follow the link to request an entitlement.
+2. Apply for the DriverKit entitlement.
+3. Provide a description of the apps you’ll use.
+
+Entitlements file with ```.entitlements``` extentions contains them.
+
+### Info.plist and matching:
+*more details coming soon...*
+
+In short, the plist file, which is located in the Xcode project, 
+is used so that the system can understand for which device this driver is suitable. 
+That is, when the system looks for a driver to use for a particular device, 
+it will check whether the information from this file is appropriate for the device, or not.
 
 ### Basic instruction outlay:
 
@@ -425,29 +462,6 @@ Congratulations! That is actually Your first DriverKit driver! Even though it do
 from the keyboard (it just retains it) it is, nevertheless, a driver. 
 Yet it is not The End –– in order to run that driver You need to perform some more, less code-oriented, steps.
 
-### Information about the driver and matching:
-*more details coming soon...*
-
-In short, the plist file, which is located in the Xcode project, 
-is used so that the system can understand for which device this driver is suitable. 
-That is, when the system looks for a driver to use for a particular device, 
-it will check whether the information from this file is appropriate for the device, or not.
-
-### Entitlements
-*more details coming soon...*
-
-In order for driver to interact with devices and services, You are required to request 
-the entitlement for DriverKit development from Apple.
-
-The system loads only drivers, which that have a valid set of entitlements, that is why You cannot develop a complete product without them. 
-The DriverKit entitlements give your driver permission to run as a driver and define the type of hardware Your driver supports.
-
-To perform  installation, your app must have the System Extension entitlement. 
-
-To request entitlement:
-1. Go to https://developer.apple.com/system-extensions/ and follow the link to request an entitlement.
-2. Apply for the DriverKit entitlement.
-3. Provide a description of the apps you’ll use.
 
 ### Installing Your driver:
 *Based on guidelines and recommendations from [6].*
