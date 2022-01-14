@@ -1,5 +1,5 @@
 # :mage: Instruction for creating macOS Drivers 
-Operational systems course project at UCU.
+Operational systems course project at UCU (Ukrainian Catholic University).
 
 *Warning: instruction is unfinished.*
 
@@ -39,35 +39,24 @@ for writing drivers with DriverKit SDK, DriverKit documentation on [Apple Develo
 ## Introduction:
 Before diving into more specific tools and examples, let's check some of the definitions and brief details about drivers and their development.
 
-### Notions definitions:
-*coming soon...*
-* **driver**
-* **tailored runtime**
-* **instantiation**
-* **definition**
-* **initialization**
-* ****
-* ****
-* ****
-* **nub** – is an object, which represents a communication channel for a device. (more [here](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/ArchitectOverview/ArchitectOverview.html#//apple_ref/doc/uid/TP0000013-BEHDCDDC)) 
-
 ### Acronyms:
-*coming soon...*
 * **Dext** – driver extension.
 * **Kext** – kernel extension.
 * **SDK** – Software Development Kit.
 * **HID** - Human Interface Device.
-* **API**
-* **I/O**
-* **NIC**
-* **USB**
+* **API** - Application Programming Interface
+* **I/O** - Input / Output
+* **NIC** - Network Interface Controller
+* **USB** - Universal Serial Bus
 * **IIG** - I/O Kit Interface generator
 * **RTTI** - runtime type information
 * **PCI** - Peripheral Component Interconnect
-* ****
-* ****
-* ****
-* ****
+* **SIP** - System Integrity Protection
+* **plist** - property list
+
+**Some notions definitions:**
+* **driver** - code/program for control of a hardware device.
+* **nub** – is an object, which represents a communication channel for a device. (more [here](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/ArchitectOverview/ArchitectOverview.html#//apple_ref/doc/uid/TP0000013-BEHDCDDC)) 
 
 ### Introduction to drivers:
 Essentially, a driver is a specific code, which controls a corresponding I/O device, attached to the computer [2]. 
@@ -229,6 +218,10 @@ Each system extention (including dexts, which are our main concern) comes with w
 The ```activationRequest``` makes extention available. It can be activated in the App launch, but it is not mandatory. For example, Your app might have some kind of intercation with the user, before install extention (it might ask for user's permission, etc). From the moment of activation the lifecycle of the driver extention will be managed by the system itself. It, for example, means that dext will start the moment it is needed –– when a matching device is connected to the system, etc.
 
 In the example, available in the repository, there is also example of an App, written in Swift.
+
+Also, extention is a separate bundle from You App (even tho it is embedded into it), so it has a separate Info.plist (more about it in the [Info.plist and matching](#infoplist-and-matching) section) and it is a separate target in Xcode. Drivers are flat bundles (as You will see, they have no contents folder). 
+
+To conclude, to install driver You do not need an instaler or package –– driver will already be a part of Your App bundle.
 
 ### Classes in DriverKit:
 DriverKit uses different classes for the dext development. There are classes for the drivers themselves, for memory operations, queues, interrupts, timers, etc.
