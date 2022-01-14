@@ -209,14 +209,19 @@ For some kind of a more complicated device (for example, keyboard), You will nee
 
 Now, moving to methods implementations, here is what each method does (not including methods, specific to different devices and families):
 1. init() – here memory for instance variables must be allocated (so You allocate structure ..._IVars)
-2. free() - 
-3. Start() - 
-4. Stop() - 
+2. free() - releases instance variables, allocated during init()
+3. Start() - starts service, validates and mathes the provider to the service, configures data structures, prepares hardware, uses other custom methods, etc 
+4. Stop() - undoes everything, which Start() did
 
+To install Your dext, You will aslo need and App for its activation (more about it in the section below).
 
+Also, to run Your dexts, You will need entitlements (more about them in [Entitlements](#entitlements) section), even tho for debug You can omit that step. Furthermore, to build system extention You need Developer ID (more about them in [Additionally](#additionally) section). For distribution extention must be signed with Your Apps signing certificate and it must be Notarized (more about Notarization [here](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution)).
 
+You also need to get the Info.plist file ready, because it holds property list and among properties it has a key, which is involved during device matching (more about it in the [Info.plist and matching](#infoplist-and-matching) section).
 
-For information on debug visit [Debug](#debug) section, which is a part of example/case-study part of the instruction.
+Now the only thing left is to build the App and launch it. After activation the lifecycle of the driver will be managed by the system. You should then be able to find out its process ID using ```ps -ax | grep -i myuser``` command and debug it using ```sudo lldb``` command. 
+
+For information on debug and local development (with turned off SIP) visit [Debug](#debug) section, which is a part of example/case-study part of the instruction.
 
 ### Apps and system extentions relationship:
 Each system extention (including dexts, which are our main concern) comes with with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extention. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
@@ -256,7 +261,7 @@ A little about some of the classes functionality/meaning:
 * OSAction class (for C Function Pointer representation) encapsulates callback from I/O Kit API.
 * etc
 
-DriverKit supports different device familes. So, there are different frameworks for different families, such as:
+DriverKit supports different device familes, which provide abstractions of different devices (while IOService represents all devices). So, there are different frameworks for different families, such as:
 * NetworkingDriverKit ([link](https://developer.apple.com/documentation/networkingdriverkit))
 * HIDDriverKit ([link](https://developer.apple.com/documentation/hiddriverkit)) (used in the example with the keyboard)
 * USBDriverKit ([link](https://developer.apple.com/documentation/usbdriverkit))
@@ -280,7 +285,7 @@ Other limits, which were discussed previosly, are API limits: there is no direct
 On a further note, the default language for the DriverKit API is C++17.
 
 ### Entitlements:
-Entitlements are required as one of the security measures.
+Entitlements are required as one of the security measures, they declare capabilities of extentions.
 
 In order for driver to interact with devices and services, You are required to request the entitlement for DriverKit development from Apple.
 
@@ -299,19 +304,25 @@ To request entitlement:
 Entitlements file with ```.entitlements``` extentions contains them.
 
 ### Info.plist and matching:
-*more details coming soon...*
-
-In short, the plist file, which is located in the Xcode project, 
-is used so that the system can understand for which device this driver is suitable. 
+Info.plit (property list) file has usage description of the extention (what it does, why should user use it, etc).
+Also, the IOKitPersonalities key from the plist file, is used so that the system can understand for which device this driver is suitable. 
 That is, when the system looks for a driver to use for a particular device, 
-it will check whether the information from this file is appropriate for the device, or not.
+it will check whether the information from this key is appropriate for the device, or not. More about that [here](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) in "Provide Version and Description Information" and "Specify Criteria for Matching Your Services Against Devices" sections.
+
+Also, for dext update You should change vetsion in the plist, so the system understands, that the driver should be updated.
 
 ### Basic development steps:
 
 
+
+
+*soon**
+
+
+
 ---
 ## Drivers using DriverKit framework –– example:
-An example, or case-study of DriverKit dext development.
+An example, or case-study of DriverKit dext development. Following instruction will provide an example of the keyboard driver creation, will repeat some information from the previos sections for further understanding and will provide some new information.
 
 ### Starting:
 To start a project, we will create it in the Xcode, which provides a base template for creating DriverKit drivers.
@@ -577,13 +588,12 @@ install and activate our driver.
 The thing is –– all the drivers come with an app, and for DriverKit having an app is a requirement. So we don't just 
 install drivers, we install them from the corresponding app.
 
-In the [Starting](#starting) section before creating a driver we first create an app project, and now we 
-will focus on it.
+For the installation we will use an example driver from the official Apple developer website, which is already approved and is availabe in this repository.
 
 The example in [examples/HandlingKeyboardEventsFromAHumanInterfaceDevice](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice) 
 provides full code for the Swift app and code for the driver (partly discussed previously).
 
-Lets see which part of app is related to the driver:
+Lets see which part of the Swift app is related to the driver:
 ```
 // Activate the driver.
 let request = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: driverID, queue: DispatchQueue.main)
@@ -591,10 +601,11 @@ request.delegate = self
 let extensionManager = OSSystemExtensionManager.shared
 extensionManager.submitRequest(request)
 ```
+Here You can see the ```activationRequest```, which we discussed in previous sections.
 
 This part of code is used to activate Your driver and it can be found in [AppDelegate.swift](examples/HandlingKeyboardEventsFromAHumanInterfaceDevice/HIDKeyboardApp/AppDelegate.swift).
 
-Now You can launch Your app and install the driver. 
+Now You can launch Your app and install the driver. From the moment of activation, the system itself will manage driver's lifecycle.
 
 But what if You dont have entitlements from Apple, but still want to install the driver? 
 Visit the following, “debug” section.
