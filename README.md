@@ -1,29 +1,35 @@
 # :mage: Instruction for creating macOS Drivers 
 Operational systems course project at UCU (Ukrainian Catholic University).
 
-*Warning: instruction is unfinished.*
+*Warning: instruction lacks practical examples of installation and debugging.*
 
 ### :ukraine: For Ukrainian translation click [here](ukrainian_version.md)
 
 ---
 
 ## Table of contents
-*Needs revision*
-
-1. [Instruction](#instruction)
-1. [Definitions](#definitions)
-1. [Notions and acronyms](#notions-and-acronyms)
-1. [Introduction to drivers](#introduction-to-drivers)
-1. [Details on the task for macOS](#details-on-the-task-for-macos)
+1. [Introduction](#introduction)
+    1. [Acronyms](#acronyms)
+    1. [Introduction to drivers](#introduction-to-drivers)
+    1. [Details on the task for macOS](#details-on-the-task-for-macos)
 1. [macOS tools](#macos-tools)
     1. [More about I/O kit](#more-about-io-kit)
     1. [More about DriverKit](#more-about-driverkit)
-1. [Drivers using DriverKit framework](#drivers-using-driverkit-framework)
+1. [Drivers using DriverKit framework –– about](#drivers-using-driverkit-framework--about)
+    1. [How dext works in the system](#how-dext-works-in-the-system)
+    1. [Creating driver extention](#creating-driver-extention)
+    1. [Apps and system extentions relationship](#apps-and-system-extentions-relationship)
+    1. [Classes in DriverKit](#classes-in-driverkit)
+    1. [Restriction of the C++ subset](#restriction-of-the-c-subset)
+    1. [Entitlements](#entitlements)
+    1. [Info.plist and matching](#infoplist-and-matching)
+    1. [Basic development steps](#infoplist-and-matching)
+1. [Drivers using DriverKit framework –– example](#drivers-using-driverkit-framework--example)
     1. [Starting](#starting)
     1. [Building up the project](#building-up-the-project)
-    1. [Information about the driver and matching](#information-about-the-driver-and-matching)
     1. [Installing Your driver](#installing-your-driver)
-1. [Drivers using I/O Kit collection of frameworks](#drivers-using-io-kit-collection-of-frameworks)
+    1. [Debug](#debug)
+1. [Additionaly](#additionaly)
 1. [Sources/literature](#sourcesliterature)
 
 ---
@@ -63,15 +69,15 @@ Essentially, a driver is a specific code, which controls a corresponding I/O dev
 In other words, drivers can be viewed as a bridge between computer peripherals and the rest of the system. [3] 
 So, it is a mean of communication and control. 
  
-Andrew Tanenbaum’s “Modern Operating Systems” [2] provide a good overview for the drivers, which run in the kernel 
-space, but in this tutorial we will mostly focus on the drivers, which run in the user space. 
+Andrew Tanenbaum’s “Modern Operating Systems” [2] provides a good overview of the drivers, which run in the kernel 
+space, but in this tutorial, we will mostly focus on the drivers, which run in the user space. 
 
 If You would like to check the [I/O Registry](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/TheRegistry/TheRegistry.html) (it contains a dynamic "tree" with nubs and drivers) of Your system, You can run the following command in terminal: ```ioreg```.
 
 ### Details on the task for macOS:
 As told in Amit Singh's "Mac OS X Internals. A Systems Approach" [1], even though usually writing drivers can be considered
 difficult, the macOS driver architecture is helpful in this regard. One of the most appealing advantages is that it
-supports user space drivers (importance of which we will discuss a little later –– in the DriverKit section).
+supports user space drivers (the importance of which we will discuss a little later –– in the DriverKit section).
 
 The book, mentioned above provides a great overview of drivers architecture and task of writing them for the macOS systems. 
 Here I will include some of the details, that might be important for understanding, when only starting working with
@@ -136,19 +142,19 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ---
 ##  Drivers using DriverKit framework –– about:
-In this part we will continue discussing DriverKit, but in more detail. So, in DriverKit Dext (Driver Extention) –– is a system extention, which controls hardware and is available to the entire system. There are even some DriverKit drivers, which come with Catalina, so even tho this kit is quite new, it is approved and officially used by Catalina system developers.
+In this part we will continue discussing DriverKit, but in more detail. So, in DriverKit Dext (Driver extension) –– is a system extension, which controls hardware and is available to the entire system. There are even some DriverKit drivers, which come with Catalina, so even tho this kit is quite new, it is approved and officially used by Catalina system developers.
 
 ### How dext works in the system:
-As it was already said, dexts work in the userspace, so their workflow is a bit different from the kernel extentions. In short, when a device appears (for wich we created or already have a driver extention), I/O Kit matching (which is already prewritten) creates a kernel service to represent Your service. Then system starts a process for the driver (for example, written by You). There will be a new instance of driver for each devices (so a new process is started for each of them). 
+As it was already said, dexts work in the userspace, so their workflow is a bit different from the kernel extensions. In short, when a device appears (for which we created or already have a driver extension), I/O Kit matching (which is already prewritten) creates a kernel service to represent Your service. Then system starts a process for the driver (for example, written by You). There will be a new instance of driver for each devices (so a new process is started for each of them). 
 
 For more detailed information on that topic check video-presentation [4] of the DriverKit approximately from the 12th minute.
 
-### Creating driver extention:
+### Creating driver extension:
 As it was told before, DriverKit API is based on the the [I/O Kit API](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Introduction/Introduction.html#//apple_ref/doc/uid/TP0000011-CH204-TPXREF101). This new, DriverKit API, is limited, it has **no direct access** to file system, networking and IPC. Some of it's classes are based on corresponding I/O Kit classes, some are completely new (for more info visit [Classes in DriverKit](#classes-in-driverkit) section).
 
 To create a dext project, You can use a template from the Xcode. It will be a great starting point for development of Your driver.
 
-DriverKit uses classes for dext development. So, to start creating driver we should define its class. There is a special file, which holds class definition for a driver. It is the **.iig file**, interface of the driver is described in it. Such files are processed by the IIG (I/O Kit Interface Generator) tool. This file consists of a class with standard C/C++ types and structure definitions (althouth it has some new attributes for messaging and dispatch queues that allow communication with separate address spaces), and it is compiled using Clang compiler.
+DriverKit uses classes for dext development. So, to start creating driver we should define its class. There is a special file, which holds class definition for a driver. It is the **.iig file**, interface of the driver is described in it. Such files are processed by the IIG (I/O Kit Interface Generator) tool. This file consists of a class with standard C/C++ types and structure definitions (although it has some new attributes for messaging and dispatch queues that allow communication with separate address spaces), and it is compiled using Clang compiler.
 
 The basic class definition requires You to override following methods (although the most basic .iig file contents from the Xcode template provides only Start method, so this others are not mandatory but are still needed in most cases):
 ```
@@ -181,7 +187,7 @@ public:
 
 Depending on the device You are writing driver for, You will want to use different families of drivers and hence You will need to implement more specific and custom methods. For example, if You want to write a driver for a keyboard, You will need to use HIDDriverKit framework and write different methods such as parseKeyboardElement, handleKeyboardReport, etc. They will usually have the  LOCALONLY macro, which means that they will run only locally in this dext's process space.
 
-So, different families have different class definitions and implemenations.
+So, different families have different class definitions and implementations.
 
 Moving to implementations: class methods implementations reside in the **.cpp file** with the same name as Your dext project (and with the same name as the .iig file, too). Here You implement methods from the class definition. But firstly, You will need to define a structure with Instance variable definitions. These will be variables, memory for which will be allocated during the initialization. 
 
@@ -199,12 +205,12 @@ For some kind of a more complicated device (for example, keyboard), You will nee
 Now, moving to methods implementations, here is what each method does (not including methods, specific to different devices and families):
 1. init() – here memory for instance variables must be allocated (so You allocate structure ..._IVars)
 2. free() - releases instance variables, allocated during init()
-3. Start() - starts service, validates and mathes the provider to the service, configures data structures, prepares hardware, uses other custom methods, etc 
+3. Start() - starts service, validates and matches the provider to the service, configures data structures, prepares hardware, uses other custom methods, etc 
 4. Stop() - undoes everything, which Start() did
 
-To install Your dext, You will aslo need and App for its activation (more about it in the section below).
+To install Your dext, You will also need an App for its activation (more about it in the section below).
 
-Also, to run Your dexts, You will need entitlements (more about them in [Entitlements](#entitlements) section), even tho for debug You can omit that step. Furthermore, to build system extention You need Developer ID (more about them in [Additionally](#additionally) section). For distribution extention must be signed with Your Apps signing certificate and it must be Notarized (more about Notarization [here](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution)).
+Also, to run Your dexts, You will need entitlements (more about them in [Entitlements](#entitlements) section), even tho for debug You can omit that step. Furthermore, to build system extension You need Developer ID (more about them in [Additionally](#additionally) section). For distribution extension must be signed with Your Apps signing certificate and it must be Notarized (more about Notarization [here](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution)).
 
 You also need to get the Info.plist file ready, because it holds property list and among properties it has a key, which is involved during device matching (more about it in the [Info.plist and matching](#infoplist-and-matching) section).
 
@@ -212,14 +218,14 @@ Now the only thing left is to build the App and launch it. After activation the 
 
 For information on debug and local development (with turned off SIP) visit [Debug](#debug) section, which is a part of example/case-study part of the instruction.
 
-### Apps and system extentions relationship:
-Each system extention (including dexts, which are our main concern) comes with with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extention. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
+### Apps and system extensions relationship:
+Each system extension (including dexts, which are our main concern) comes with an App. It belongs to this App's bundle, so the user can install an App in order to install Your custom system extension. So, they are distributed with Apps (that requires Developer ID, more about it in [Additionally](#additionaly) section). 
 
-The ```activationRequest``` makes extention available. It can be activated in the App launch, but it is not mandatory. For example, Your app might have some kind of intercation with the user, before install extention (it might ask for user's permission, etc). From the moment of activation the lifecycle of the driver extention will be managed by the system itself. It, for example, means that dext will start the moment it is needed –– when a matching device is connected to the system, etc.
+The ```activationRequest``` makes extension available. It can be activated in the App launch, but it is not mandatory. For example, Your app might have some kind of interaction with the user, before install extension (it might ask for user's permission, etc). From the moment of activation the lifecycle of the driver extension will be managed by the system itself. It, for example, means that dext will start the moment it is needed –– when a matching device is connected to the system, etc.
 
 In the example, available in the repository, there is also example of an App, written in Swift.
 
-Also, extention is a separate bundle from You App (even tho it is embedded into it), so it has a separate Info.plist (more about it in the [Info.plist and matching](#infoplist-and-matching) section) and it is a separate target in Xcode. Drivers are flat bundles (as You will see, they have no contents folder). 
+Also, extension is a separate bundle from You App (even tho it is embedded into it), so it has a separate Info.plist (more about it in the [Info.plist and matching](#infoplist-and-matching) section) and it is a separate target in Xcode. Drivers are flat bundles (as You will see, they have no contents folder). 
 
 To conclude, to install driver You do not need an instaler or package –– driver will already be a part of Your App bundle.
 
@@ -262,7 +268,7 @@ DriverKit supports different device familes, which provide abstractions of diffe
 * SerialDriverKit ([link](https://developer.apple.com/documentation/serialdriverkit))
 * PCIDriverKit ([link](https://developer.apple.com/documentation/pcidriverkit))
 
-Considering their functionality, different families have different class definitions and implemenations.
+Considering their functionality, different families have different class definitions and implementations.
 
 ### Restriction of the C++ subset:
 As it is described in the [documentation](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF105) C++ is restricted for the I/O Kit (so only a subset of the language can be used in driver development). I/O Kit does not allow:
@@ -271,14 +277,14 @@ As it is described in the [documentation](https://developer.apple.com/library/ar
 * templates
 * RTTI (runtime type information)
 
-I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extentions do not), so there is no such limit for it. It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
+I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extensions do not), so there is no such limit for it. It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
 
 Other limits, which were discussed previosly, are API limits: there is no direct access to file system, networking and IPC.
 
 On a further note, the default language for the DriverKit API is C++17.
 
 ### Entitlements:
-Entitlements are required as one of the security measures, they declare capabilities of extentions.
+Entitlements are required as one of the security measures, they declare capabilities of extensions.
 
 In order for driver to interact with devices and services, You are required to request the entitlement for DriverKit development from Apple.
 
@@ -294,10 +300,10 @@ To request entitlement:
 2. Apply for the DriverKit entitlement.
 3. Provide a description of the apps you’ll use.
 
-Entitlements file with ```.entitlements``` extentions contains them.
+Entitlements file with ```.entitlements``` extensions contains them.
 
 ### Info.plist and matching:
-Info.plit (property list) file has usage description of the extention (what it does, why should user use it, etc).
+Info.plit (property list) file has usage description of the extension (what it does, why should user use it, etc).
 Also, the IOKitPersonalities key from the plist file, is used so that the system can understand for which device this driver is suitable. 
 That is, when the system looks for a driver to use for a particular device, 
 it will check whether the information from this key is appropriate for the device, or not. More about that [here](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) in "Provide Version and Description Information" and "Specify Criteria for Matching Your Services Against Devices" sections.
@@ -689,9 +695,9 @@ That is it, now You have both Your app and driver debugged and ready for further
 
 ---
 ## Additionaly:
-To be able to build driver (and have more access in macOS development in general), You need to have a Developer ID. Without it You still can develop apps (using Your Apple ID You will have a personal development team), but not the ones, which work with System Extentions.
+To be able to build driver (and have more access in macOS development in general), You need to have a Developer ID. Without it You still can develop apps (using Your Apple ID You will have a personal development team), but not the ones, which work with System extensions.
 
-To obtain the Developer ID certificate (more info [here](https://developer.apple.com/support/developer-id/)) You will need to enroll in the [Apple Developer Program](https://developer.apple.com/programs/) (or Apple Developer Enterprise Program). Here is the enrollment [link](https://developer.apple.com/programs/enroll/), check wich type of enrollment You need/prefer and follow the link in the bottom of the page. Bear in mind, that You still need an Apple ID for that, and the program costs US$99 (price as for January, 2022).
+To obtain the Developer ID certificate (more info [here](https://developer.apple.com/support/developer-id/)) You will need to enroll in the [Apple Developer Program](https://developer.apple.com/programs/) (or Apple Developer Enterprise Program). Here is the enrollment [link](https://developer.apple.com/programs/enroll/), check which type of enrollment You need/prefer and follow the link in the bottom of the page. Bear in mind, that You still need an Apple ID for that, and the program costs US$99 (price as for January, 2022).
 
 ---
 ## Sources/literature:
