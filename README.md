@@ -323,7 +323,7 @@ Also, for dext update You should change vetsion in the plist, so the system unde
 1. Lauch App.
 1. Debug/use dext.
 
-+ You will need to obtain a Developer ID or another fitting certificate for dext development.
+\+ You will need to obtain a Developer ID or another fitting certificate for dext development.
 
 ---
 ## Drivers using DriverKit framework –– example:
