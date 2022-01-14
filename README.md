@@ -34,14 +34,31 @@ Let's get started and enter the magical world of the drivers creation, and May t
 ## Introduction:
 Before diving into more specific tools and examples, let's check some of the definitions and brief details about drivers and their development.
 
-### Definitions:
+### Notions definitions:
 *coming soon...*
+* **driver**
+* **tailored runtime**
+* ****
+* ****
+* ****
+* ****
+* ****
+* ****
 
-### Notions and acronyms:
+### Acronyms:
+*coming soon...*
 * **Dext** – driver extension.
 * **Kext** – kernel extension.
 * **SDK** – Software Development Kit.
 * **HID** - Human Interface Device.
+* **API**
+* **I/O**
+* **NIC**
+* **USB**
+* **IIG** - I/O Kit Interface generator
+* ****
+* ****
+* ****
 
 ### Introduction to drivers:
 Essentially, a driver is a specific code, which controls a corresponding I/O device, attached to the computer [2]. 
@@ -124,7 +141,16 @@ We will try the newer, more secure, and, perhaps, an easier approach –– Driv
 
 ### Class hierarchy:
 
-### C++ subset:
+### Restriction of the C++ subset:
+As it is described in the [documentation](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF105) C++ is restricted for the I/O Kit (so only a subset of the language can be used in driver development). I/O Kit does not allow:
+* exceptions
+* multiple inheritance
+* templates
+* RTTI (runtime type information)
+
+I did not find information on same matters for the DriverKit, but we should consider that it was created on the basis of I/O Kit, so it might have the same restrictions (at least a part of them). On the other hand, dexts run in user space, so they might not have the same restrictions. In the video-presentation [4] it was said, that DriverKit allows dynamic memory allocation (which kernel extentions do not). It still discusses some restrictions on dexts. For example, dexts must run in a tailored runtime, which isolates them from the rest of the system.
+
+On a further note, the default language for the DriverKit API is C++17.
 
 ### Briefly about internal workflow:
 
@@ -528,7 +554,7 @@ That is it, now You have both Your app and driver debugged and ready for further
 ## Additionaly:
 To be able to build driver (and have more access in macOS development in general), You need to have a Developer ID. Without it You still can develop apps (using Your Apple ID You will have a personal development team), but not the ones, which work with System Extentions.
 
-To obtain the Developer ID certificate (more info [here](https://developer.apple.com/support/developer-id/)) You will need to enroll in the [Apple Developer Program](https://developer.apple.com/programs/) (or Apple Developer Enterprise Program). Here is the enrollment [link](https://developer.apple.com/programs/enroll/), check wich type of enrollment You need/prefer and follow the link in the bottom of the page. Bear in mind, that You still need an Apple ID for that, and the program costs 99$ (price as for January, 2022).
+To obtain the Developer ID certificate (more info [here](https://developer.apple.com/support/developer-id/)) You will need to enroll in the [Apple Developer Program](https://developer.apple.com/programs/) (or Apple Developer Enterprise Program). Here is the enrollment [link](https://developer.apple.com/programs/enroll/), check wich type of enrollment You need/prefer and follow the link in the bottom of the page. Bear in mind, that You still need an Apple ID for that, and the program costs US$99 (price as for January, 2022).
 
 ---
 ## Sources/literature:
@@ -543,6 +569,7 @@ To obtain the Developer ID certificate (more info [here](https://developer.apple
 9. [Introduction to I/O Kit Fundamentals](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Introduction/Introduction.html)
 10. [Preparing the Development Team](https://developer.apple.com/library/archive/documentation/General/Conceptual/ApplicationDevelopmentOverview/CreateYourDevelopmentTeam/CreateYourDevelopmentTeam.html)
 11. [Non-macOS driver template example (Oracle)](https://docs.oracle.com/cd/E36784_01/html/E36866/eqbof.html#scrolltoc)
+12. [I/O Kit language choice](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/IOKitFundamentals/Features/Features.html#//apple_ref/doc/uid/TP0000012-TPXREF105)
 
 ## Arranged by:
 * [Daria Omelkina](https://github.com/dariaomelkina)
