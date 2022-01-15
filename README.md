@@ -6,7 +6,6 @@ Operational systems course project at UCU (Ukrainian Catholic University).
 ### :ukraine: For Ukrainian translation click [here](ukrainian_version.md)
 
 ---
-
 ## Table of contents
 1. [Introduction](#introduction)
     1. [Acronyms](#acronyms)
@@ -46,10 +45,10 @@ for writing drivers with DriverKit SDK, DriverKit documentation on [Apple Develo
 Before diving into more specific tools and examples, let's check some of the definitions and brief details about drivers and their development.
 
 ### Acronyms:
-* **Dext** – driver extension.
-* **Kext** – kernel extension.
-* **SDK** – Software Development Kit.
-* **HID** - Human Interface Device.
+* **Dext** – driver extension
+* **Kext** – kernel extension
+* **SDK** – Software Development Kit
+* **HID** - Human Interface Device
 * **API** - Application Programming Interface
 * **I/O** - Input / Output
 * **NIC** - Network Interface Controller
@@ -308,7 +307,7 @@ Also, the IOKitPersonalities key from the plist file, is used so that the system
 That is, when the system looks for a driver to use for a particular device, 
 it will check whether the information from this key is appropriate for the device, or not. More about that [here](https://developer.apple.com/documentation/driverkit/creating_a_driver_using_the_driverkit_sdk) in "Provide Version and Description Information" and "Specify Criteria for Matching Your Services Against Devices" sections.
 
-Also, for dext update You should change vetsion in the plist, so the system understands, that the driver should be updated.
+Also, for dext update You should change version in the plist, so the system understands, that the driver should be updated.
 
 ### Basic development steps:
 1. Create an App project in Xcode.
