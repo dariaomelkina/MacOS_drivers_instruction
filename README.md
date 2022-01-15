@@ -6,7 +6,7 @@ Operational systems course project at UCU (Ukrainian Catholic University).
 ### :ukraine: For Ukrainian translation click [here](ukrainian_version.md)
 
 ---
-## Table of contents
+## Table of contents:
 1. [Introduction](#introduction)
     1. [Acronyms](#acronyms)
     1. [Introduction to drivers](#introduction-to-drivers)
@@ -22,7 +22,7 @@ Operational systems course project at UCU (Ukrainian Catholic University).
     1. [Restriction of the C++ subset](#restriction-of-the-c-subset)
     1. [Entitlements](#entitlements)
     1. [Info.plist and matching](#infoplist-and-matching)
-    1. [Basic development steps](#infoplist-and-matching)
+    1. [Basic development steps](#basic-development-steps)
 1. [Drivers using DriverKit framework –– example](#drivers-using-driverkit-framework--example)
     1. [Starting](#starting)
     1. [Building up the project](#building-up-the-project)

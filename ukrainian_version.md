@@ -6,30 +6,30 @@
 ### :uk: Для перегляду англійської версії перейдіть за наступним [посиланням](README.md)
 
 ---
-## Зміст
-1. [Introduction](#introduction)
-    1. [Acronyms](#acronyms)
-    1. [Introduction to drivers](#introduction-to-drivers)
-    1. [Details on the task for macOS](#details-on-the-task-for-macos)
-1. [macOS tools](#macos-tools)
-    1. [More about I/O kit](#more-about-io-kit)
-    1. [More about DriverKit](#more-about-driverkit)
-1. [Drivers using DriverKit framework –– about](#drivers-using-driverkit-framework--about)
-    1. [How dext works in the system](#how-dext-works-in-the-system)
-    1. [Creating driver extension](#creating-driver-extension)
-    1. [Apps and system extensions relationship](#apps-and-system-extensions-relationship)
-    1. [Classes in DriverKit](#classes-in-driverkit)
-    1. [Restriction of the C++ subset](#restriction-of-the-c-subset)
-    1. [Entitlements](#entitlements)
-    1. [Info.plist and matching](#infoplist-and-matching)
-    1. [Basic development steps](#infoplist-and-matching)
-1. [Drivers using DriverKit framework –– example](#drivers-using-driverkit-framework--example)
-    1. [Starting](#starting)
-    1. [Building up the project](#building-up-the-project)
-    1. [Installing Your driver](#installing-your-driver)
-    1. [Debug](#debug)
-1. [Additionaly](#additionaly)
-1. [Sources/literature](#sourcesliterature)
+## Зміст:
+1. [Вступ](#вступ)
+    1. [Акроніми](#акроніми)
+    1. [Вступ у світ драйверів](#вступ-у-світ-драйверів)
+    1. [Деталі завдання для macOS](#деталі-завдання-для-macos)
+1. [Інструменти для macOS](#інструменти-для-macos)
+    1. [Детальніше про I/O Kit](#детальніше-про-io-kit)
+    1. [Більше про DriverKit](#більше-про-driverkit)
+1. [Створення драйверів з DriverKit –– опис](#створення-драйверів-з-driverkit--опис)
+    1. [Як dext'и працюють в системі](#як-dextи-працюють-в-системі)
+    1. [Створення драйвера](#створення-драйвера)
+    1. [Взаємозв'язок застосунків і системних розширень](#взаємозвязок-застосунків-і-системних-розширень)
+    1. [Класи в DriverKit](#класи-в-driverkit)
+    1. [Обмеження підмножини C++](#обмеження-підмножини-c)
+    1. [Права (entitlements)](#права-entitlements)
+    1. [Info.plist та метчінг](#infoplist-та-метчінг)
+    1. [Основні кроки розробки](#основні-кроки-розробки)
+1. [Створення драйверів з DriverKit –– приклад](#створення-драйверів-з-driverkit--приклад)
+    1. [Початок](#початок)
+    1. [Білд проекту](#білд-проекту)
+    1. [Інсталяція драйвера](#інсталяція-драйвера)
+    1. [Дебаг](#дебаг)
+1. [Додатково](#додатково)
+1. [Джерела/література](#джерелалітература)
 
 
 # :coffee: Інструкція:
@@ -283,7 +283,7 @@ DriverKit підтримує різні сімейства пристроїв, �
 
 Крім того, мова за замовчуванням для DriverKit API — це C++17.
 
-### Права (entitlements)
+### Права (entitlements):
 Як один із заходів безпеки потрібні entitlements (права), вони оголошують можливості розширень.
 
 Для того, щоб драйвер міг взаємодіяти з пристроями та сервісами, вам потрібно запросити
